@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RepairBridge - Vehicle Data Management Platform</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="layout-fix.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Main Title -->
+    <h1 class="main-title">RepairBridge Platform</h1>
+
+    <!-- Main App Container -->
+    <div class="app-container">
+        <!-- Navigation Header -->
+        <nav class="nav-header">
+            <div class="nav-brand">
+                <i class="fas fa-bridge"></i>
+                <span>RepairBridge</span>
+            </div>
+            <div class="nav-links">
+                <button class="nav-btn active" data-section="dashboard">Dashboard</button>
+                <button class="nav-btn" data-section="data-aggregator">Data Hub</button>
+                <button class="nav-btn" data-section="ar-diagnostics">AR Diagnostics</button>
+                <button class="nav-btn" data-section="marketplace">Marketplace</button>
+                <button class="nav-btn" data-section="inventory">Inventory</button>
+                <button class="nav-btn" data-section="analytics">Analytics</button>
+                <button class="nav-btn" data-section="compliance">Compliance</button>
+                <button class="nav-btn" data-section="settings">Settings</button>
+            </div>
+        </nav>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section active">
+            <div class="section-header">
+                <h2><i class="fas fa-tachometer-alt"></i> Dashboard Overview</h2>
+                <p>Welcome to your RepairBridge command center</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>156</h3>
+                        <p>Vehicles Serviced</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>23</h3>
+                        <p>Data Sources</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>8</h3>
+                        <p>Active Diagnostics</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>100%</h3>
+                        <p>Compliance Rate</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-widgets">
+                <div class="widget">
+                    <h3>Recent Activity</h3>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <i class="fas fa-wrench"></i>
+                            <span>BMW X5 diagnostic completed</span>
+                            <small>2 hours ago</small>
+                        </div>
+                        <div class="activity-item">
+                            <i class="fas fa-download"></i>
+                            <span>Ford data feed updated</span>
+                            <small>4 hours ago</small>
+                        </div>
+                        <div class="activity-item">
+                            <i class="fas fa-certificate"></i>
+                            <span>New certification available</span>
+                            <small>1 day ago</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="widget">
+                    <h3>Quick Actions</h3>
+                    <div class="quick-actions">
+                        <button class="action-btn">
+                            <i class="fas fa-plus"></i>
+                            New Diagnostic
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-sync"></i>
+                            Sync Data
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-report"></i>
+                            Generate Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Aggregator Section -->
+        <section id="data-aggregator" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-database"></i> Data Aggregator</h2>
+                <p>Access vehicle data from multiple OEM sources</p>
+            </div>
+
+            <div class="data-sources">
+                <div class="source-card">
+                    <div class="source-header">
+                        <h3>OEM Data Feeds</h3>
+                        <span class="status-badge active">Active</span>
+                    </div>
+                    <div class="source-list">
+                        <div class="source-item">
+                            <i class="fas fa-circle connected"></i>
+                            <span>Ford Motor Company</span>
+                            <small>Last sync: 5 min ago</small>
+                        </div>
+                        <div class="source-item">
+                            <i class="fas fa-circle connected"></i>
+                            <span>General Motors</span>
+                            <small>Last sync: 12 min ago</small>
+                        </div>
+                        <div class="source-item">
+                            <i class="fas fa-circle connected"></i>
+                            <span>Toyota Motors</span>
+                            <small>Last sync: 8 min ago</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-search">
+                <h3>Vehicle Data Search</h3>
+                <div class="search-form">
+                    <input type="text" placeholder="Enter VIN or License Plate" class="search-input">
+                    <select class="search-select">
+                        <option>All Makes</option>
+                        <option>Ford</option>
+                        <option>GM</option>
+                        <option>Toyota</option>
+                        <option>BMW</option>
+                    </select>
+                    <button class="search-btn">
+                        <i class="fas fa-search"></i>
+                        Search
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- AR Diagnostics Section -->
+        <section id="ar-diagnostics" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-vr-cardboard"></i> AR Diagnostics Assistant</h2>
+                <p>Augmented reality powered vehicle inspections</p>
+            </div>
+
+            <div class="ar-interface">
+                <div class="ar-viewport">
+                    <div class="ar-placeholder">
+                        <i class="fas fa-camera"></i>
+                        <h3>AR Camera View</h3>
+                        <p>Position camera toward vehicle component</p>
+                        <button class="ar-start-btn">
+                            <i class="fas fa-play"></i>
+                            Start AR Session
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Marketplace Section -->
+        <section id="marketplace" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-store"></i> Tools & Certifications Marketplace</h2>
+                <p>Access tools and training with group discounts</p>
+            </div>
+
+            <div class="marketplace-grid">
+                <div class="marketplace-item">
+                    <div class="item-image">
+                        <i class="fas fa-scan"></i>
+                    </div>
+                    <div class="item-info">
+                        <h4>OBD-II Scanner Pro</h4>
+                        <p>Professional diagnostic scanner with live data streaming</p>
+                        <div class="price-info">
+                            <span class="original-price">$299</span>
+                            <span class="discount-price">$249</span>
+                            <span class="discount-badge">17% OFF</span>
+                        </div>
+                    </div>
+                    <button class="add-to-cart-btn">
+                        <i class="fas fa-cart-plus"></i>
+                        Add to Cart
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Other sections simplified -->
+        <section id="inventory" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-boxes"></i> Inventory Management</h2>
+                <p>Manage parts inventory and suppliers</p>
+            </div>
+            <div class="loading-placeholder">
+                <p>Inventory management system will be loaded here...</p>
+            </div>
+        </section>
+
+        <section id="analytics" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-bar"></i> Analytics Dashboard</h2>
+                <p>View performance metrics and insights</p>
+            </div>
+            <div class="loading-placeholder">
+                <p>Analytics dashboard will be loaded here...</p>
+            </div>
+        </section>
+
+        <section id="compliance" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-shield-alt"></i> Compliance & Security</h2>
+                <p>Security monitoring and compliance management</p>
+            </div>
+            <div class="loading-placeholder">
+                <p>Compliance tools will be loaded here...</p>
+            </div>
+        </section>
+
+        <section id="settings" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-cog"></i> Settings</h2>
+                <p>Configure your RepairBridge preferences</p>
+            </div>
+            <div class="loading-placeholder">
+                <p>Settings panel will be loaded here...</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Copyright -->
+    <div class="copyright">
+        ©2025 RepairBridge
+    </div>
+
+    <!-- Simplified JavaScript -->
+    <script src="script-simple.js"></script>
+</body>
+</html>

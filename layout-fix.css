@@ -1,0 +1,31 @@
+/* Minimal Layout Fix Styles */
+
+/* Fix for content that might be too wide */
+.content-section * {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Ensure grids don't overflow */
+.vehicles-grid,
+.certificates-grid,
+.portal-features,
+.dashboard-stats {
+    overflow-x: auto;
+}
+
+/* Fix voice interface positioning to not interfere */
+.voice-interface {
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    z-index: 1000 !important;
+    pointer-events: all !important;
+}
+
+/* Responsive fixes */
+@media (max-width: 768px) {
+    .content-section {
+        padding: 10px;
+    }
+}

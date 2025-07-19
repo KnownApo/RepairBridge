@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RepairBridge - Fixed Version</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .main-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.15);
+            /* Removed backdrop-filter for better compatibility */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #ffffff;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-btn.active {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section-header {
+            margin-bottom: 24px;
+        }
+
+        .section-header h2 {
+            color: #ffffff;
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .section-header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .stat-content h3 {
+            color: #ffffff;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stat-content p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+        }
+
+        .loading-placeholder {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+
+        .copyright {
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .nav-header {
+                flex-direction: column;
+            }
+            
+            .app-container {
+                padding: 20px;
+            }
+            
+            .nav-btn {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Title -->
+    <h1 class="main-title">RepairBridge Platform</h1>
+
+    <!-- Main App Container -->
+    <div class="app-container">
+        <!-- Navigation Header -->
+        <nav class="nav-header">
+            <div class="nav-brand">
+                <span>🌉 RepairBridge</span>
+            </div>
+            <div class="nav-links">
+                <button class="nav-btn active" onclick="showSection('dashboard')">Dashboard</button>
+                <button class="nav-btn" onclick="showSection('data-aggregator')">Data Hub</button>
+                <button class="nav-btn" onclick="showSection('ar-diagnostics')">AR Diagnostics</button>
+                <button class="nav-btn" onclick="showSection('marketplace')">Marketplace</button>
+                <button class="nav-btn" onclick="showSection('inventory')">Inventory</button>
+                <button class="nav-btn" onclick="showSection('analytics')">Analytics</button>
+                <button class="nav-btn" onclick="showSection('compliance')">Compliance</button>
+                <button class="nav-btn" onclick="showSection('settings')">Settings</button>
+            </div>
+        </nav>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section active">
+            <div class="section-header">
+                <h2>📊 Dashboard Overview</h2>
+                <p>Welcome to your RepairBridge command center</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <h3>156</h3>
+                        <p>Vehicles Serviced</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <h3>23</h3>
+                        <p>Data Sources</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <h3>8</h3>
+                        <p>Active Diagnostics</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <h3>100%</h3>
+                        <p>Compliance Rate</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Aggregator Section -->
+        <section id="data-aggregator" class="content-section">
+            <div class="section-header">
+                <h2>🗄️ Data Aggregator</h2>
+                <p>Access vehicle data from multiple OEM sources</p>
+            </div>
+            <div class="loading-placeholder">
+                <h3>Data Hub</h3>
+                <p>OEM data feeds, vehicle search, and data analytics</p>
+                <p>Ford • GM • Toyota • BMW integration</p>
+            </div>
+        </section>
+
+        <!-- AR Diagnostics Section -->
+        <section id="ar-diagnostics" class="content-section">
+            <div class="section-header">
+                <h2>🔧 AR Diagnostics Assistant</h2>
+                <p>Augmented reality powered vehicle inspections</p>
+            </div>
+            <div class="loading-placeholder">
+                <h3>AR Diagnostics</h3>
+                <p>Camera interface and diagnostic tools</p>
+                <p>Live overlay • Engine data • Fault detection</p>
+            </div>
+        </section>
+
+        <!-- Other sections -->
+        <section id="marketplace" class="content-section">
+            <div class="section-header">
+                <h2>🛒 Marketplace</h2>
+                <p>Tools and training with group discounts</p>
+            </div>
+            <div class="loading-placeholder">
+                <h3>Marketplace</h3>
+                <p>Tools, training, certifications</p>
+                <p>Group discounts • OBD scanners • ASE certification</p>
+            </div>
+        </section>
+
+        <section id="inventory" class="content-section">
+            <div class="section-header">
+                <h2>📦 Inventory</h2>
+                <p>Parts inventory and supplier management</p>
+            </div>
+            <div class="loading-placeholder">
+                <h3>Inventory System</h3>
+                <p>Stock tracking, auto-reorder, supplier integration</p>
+            </div>
+        </section>
+
+        <section id="analytics" class="content-section">
+            <div class="section-header">
+                <h2>📈 Analytics</h2>
+                <p>Performance metrics and insights</p>
+            </div>
+            <div class="loading-placeholder">
+                <h3>Analytics Dashboard</h3>
+                <p>Revenue tracking, efficiency metrics, predictive analytics</p>
+            </div>
+        </section>
+
+        <section id="compliance" class="content-section">
+            <div class="section-header">
+                <h2>🛡️ Compliance</h2>
+                <p>Security monitoring and compliance</p>
+            </div>
+            <div class="loading-placeholder">
+                <h3>Compliance Vault</h3>
+                <p>AES-256 encryption, audit trails, GDPR compliance</p>
+            </div>
+        </section>
+
+        <section id="settings" class="content-section">
+            <div class="section-header">
+                <h2>⚙️ Settings</h2>
+                <p>Configure RepairBridge preferences</p>
+            </div>
+            <div class="loading-placeholder">
+                <h3>System Settings</h3>
+                <p>User management, API settings, theme customization</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Copyright -->
+    <div class="copyright">
+        ©2025 RepairBridge
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show target section
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                
+                // Add active class to clicked button
+                event.target.classList.add('active');
+            }
+        }
+        
+        console.log('RepairBridge Platform loaded successfully!');
+    </script>
+</body>
+</html>

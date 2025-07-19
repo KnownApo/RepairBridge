@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DEBUG TEST</title>
+    <style>
+        body {
+            background: red !important;
+            color: white !important;
+            font-size: 24px !important;
+            padding: 20px !important;
+        }
+    </style>
+</head>
+<body>
+    <h1>DEBUG TEST</h1>
+    <p>If you can see this red background, basic HTML/CSS is working.</p>
+    <p>Current time: <span id="time"></span></p>
+    <script>
+        document.getElementById('time').textContent = new Date().toLocaleTimeString();
+        console.log('DEBUG: JavaScript is working');
+    </script>
+</body>
+</html>
