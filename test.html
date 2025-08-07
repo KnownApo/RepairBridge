@@ -59,9 +59,9 @@
     <h1>RepairBridge Platform Test</h1>
     <div class="container">
         <div class="nav">
-            <button class="active" onclick="showContent('dashboard')">Dashboard</button>
-            <button onclick="showContent('data')">Data Hub</button>
-            <button onclick="showContent('diagnostics')">Diagnostics</button>
+            <button class="active" onclick="showContent('dashboard', this)">Dashboard</button>
+            <button onclick="showContent('data', this)">Data Hub</button>
+            <button onclick="showContent('diagnostics', this)">Diagnostics</button>
         </div>
         <div class="content" id="content">
             <h2>Dashboard</h2>
@@ -71,16 +71,16 @@
     </div>
 
     <script>
-        function showContent(section) {
+        function showContent(section, button) {
             const content = document.getElementById('content');
             const buttons = document.querySelectorAll('.nav button');
-            
+
             // Remove active class from all buttons
             buttons.forEach(btn => btn.classList.remove('active'));
-            
+
             // Add active class to clicked button
-            event.target.classList.add('active');
-            
+            button.classList.add('active');
+
             // Update content based on section
             switch(section) {
                 case 'dashboard':
