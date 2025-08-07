@@ -89,7 +89,8 @@
             font-size: 14px;
         }
 
-        .nav-btn:hover {
+        .nav-btn:hover,
+        .nav-btn:focus {
             background: rgba(255, 255, 255, 0.2);
         }
 
@@ -224,7 +225,8 @@
             gap: 8px;
         }
 
-        .action-btn:hover {
+        .action-btn:hover,
+        .action-btn:focus {
             background: rgba(79, 172, 254, 0.3);
             transform: translateY(-2px);
         }
@@ -326,7 +328,8 @@
             gap: 8px;
         }
 
-        .search-btn:hover {
+        .search-btn:hover,
+        .search-btn:focus {
             background: rgba(79, 172, 254, 0.4);
         }
 
@@ -402,8 +405,17 @@
             width: 100%;
         }
 
-        .add-to-cart-btn:hover {
+        .add-to-cart-btn:hover,
+        .add-to-cart-btn:focus {
             background: rgba(34, 197, 94, 0.3);
+        }
+
+        .nav-btn:focus,
+        .action-btn:focus,
+        .search-btn:focus,
+        .add-to-cart-btn:focus {
+            outline: 2px solid rgba(255, 255, 255, 0.8);
+            outline-offset: 2px;
         }
 
         .notification {
@@ -481,14 +493,14 @@
                 <span>🌉 RepairBridge</span>
             </div>
             <div class="nav-links">
-                <button class="nav-btn active" onclick="showSection('dashboard')">Dashboard</button>
-                <button class="nav-btn" onclick="showSection('data-aggregator')">Data Hub</button>
-                <button class="nav-btn" onclick="showSection('ar-diagnostics')">AR Diagnostics</button>
-                <button class="nav-btn" onclick="showSection('marketplace')">Marketplace</button>
-                <button class="nav-btn" onclick="showSection('inventory')">Inventory</button>
-                <button class="nav-btn" onclick="showSection('analytics')">Analytics</button>
-                <button class="nav-btn" onclick="showSection('compliance')">Compliance</button>
-                <button class="nav-btn" onclick="showSection('settings')">Settings</button>
+                <button type="button" class="nav-btn active" onclick="showSection('dashboard')">Dashboard</button>
+                <button type="button" class="nav-btn" onclick="showSection('data-aggregator')">Data Hub</button>
+                <button type="button" class="nav-btn" onclick="showSection('ar-diagnostics')">AR Diagnostics</button>
+                <button type="button" class="nav-btn" onclick="showSection('marketplace')">Marketplace</button>
+                <button type="button" class="nav-btn" onclick="showSection('inventory')">Inventory</button>
+                <button type="button" class="nav-btn" onclick="showSection('analytics')">Analytics</button>
+                <button type="button" class="nav-btn" onclick="showSection('compliance')">Compliance</button>
+                <button type="button" class="nav-btn" onclick="showSection('settings')">Settings</button>
             </div>
         </nav>
 
@@ -547,13 +559,13 @@
                 <div class="widget">
                     <h3>Quick Actions</h3>
                     <div class="quick-actions">
-                        <button class="action-btn" onclick="quickAction('diagnostic')">
+                        <button type="button" class="action-btn" onclick="quickAction('diagnostic')">
                             ➕ New Diagnostic
                         </button>
-                        <button class="action-btn" onclick="quickAction('sync')">
+                        <button type="button" class="action-btn" onclick="quickAction('sync')">
                             🔄 Sync Data
                         </button>
-                        <button class="action-btn" onclick="quickAction('report')">
+                        <button type="button" class="action-btn" onclick="quickAction('report')">
                             📊 Generate Report
                         </button>
                     </div>
@@ -601,7 +613,7 @@
                 <div class="source-card">
                     <div class="source-header">
                         <h3>Data Analytics</h3>
-                        <button class="action-btn" onclick="refreshData()">🔄 Refresh</button>
+                        <button type="button" class="action-btn" onclick="refreshData()">🔄 Refresh</button>
                     </div>
                     <div class="loading-placeholder">
                         <h4>Data Volume: 78% of monthly quota</h4>
@@ -622,7 +634,7 @@
                         <option>Toyota</option>
                         <option>BMW</option>
                     </select>
-                    <button class="search-btn" onclick="searchVehicle()">
+                    <button type="button" class="search-btn" onclick="searchVehicle()">
                         🔍 Search
                     </button>
                 </div>
@@ -646,7 +658,7 @@
                     <div class="loading-placeholder" id="ar-viewport">
                         <h3>📷 AR Camera View</h3>
                         <p>Position camera toward vehicle component</p>
-                        <button class="action-btn" onclick="toggleAR()" id="ar-toggle">
+                        <button type="button" class="action-btn" onclick="toggleAR()" id="ar-toggle">
                             ▶️ Start AR Session
                         </button>
                     </div>
@@ -655,7 +667,7 @@
                 <div class="source-card">
                     <div class="source-header">
                         <h3>Live Data Stream</h3>
-                        <button class="action-btn" onclick="updateLiveData()">📊 Refresh Data</button>
+                        <button type="button" class="action-btn" onclick="updateLiveData()">📊 Refresh Data</button>
                     </div>
                     <div class="source-list" id="live-data">
                         <div class="source-item">
@@ -711,7 +723,7 @@
                             <span class="discount-badge">17% OFF</span>
                         </div>
                     </div>
-                    <button class="add-to-cart-btn" onclick="addToCart('OBD-II Scanner Pro', '$249')">
+                    <button type="button" class="add-to-cart-btn" onclick="addToCart('OBD-II Scanner Pro', '$249')">
                         🛒 Add to Cart
                     </button>
                 </div>
@@ -726,7 +738,7 @@
                             <span class="discount-badge">22% OFF</span>
                         </div>
                     </div>
-                    <button class="add-to-cart-btn" onclick="addToCart('Leak Detection Kit', '$69')">
+                    <button type="button" class="add-to-cart-btn" onclick="addToCart('Leak Detection Kit', '$69')">
                         🛒 Add to Cart
                     </button>
                 </div>
@@ -741,7 +753,7 @@
                             <span class="discount-badge">20% OFF</span>
                         </div>
                     </div>
-                    <button class="add-to-cart-btn" onclick="addToCart('EV Diagnostics Course', '$399')">
+                    <button type="button" class="add-to-cart-btn" onclick="addToCart('EV Diagnostics Course', '$399')">
                         🛒 Add to Cart
                     </button>
                 </div>
@@ -756,7 +768,7 @@
                             <span class="discount-badge">25% OFF</span>
                         </div>
                     </div>
-                    <button class="add-to-cart-btn" onclick="addToCart('ASE Certification Prep', '$149')">
+                    <button type="button" class="add-to-cart-btn" onclick="addToCart('ASE Certification Prep', '$149')">
                         🛒 Add to Cart
                     </button>
                 </div>
@@ -952,7 +964,7 @@
                     viewport.innerHTML = `
                         <h3>📹 AR Session Active</h3>
                         <p>Camera overlay enabled - Point at vehicle component</p>
-                        <button class="action-btn" onclick="toggleAR()" id="ar-toggle">
+                        <button type="button" class="action-btn" onclick="toggleAR()" id="ar-toggle">
                             ⏸️ Stop AR Session
                         </button>
                     `;
@@ -970,7 +982,7 @@
                 viewport.innerHTML = `
                     <h3>📷 AR Camera View</h3>
                     <p>Position camera toward vehicle component</p>
-                    <button class="action-btn" onclick="toggleAR()" id="ar-toggle">
+                    <button type="button" class="action-btn" onclick="toggleAR()" id="ar-toggle">
                         ▶️ Start AR Session
                     </button>
                 `;
