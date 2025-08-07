@@ -1,7 +1,6 @@
 # RepairBridge - Vehicle Data Management Platform
 
 A comprehensive data-access and management platform designed to bridge the gap between independent mechanics and OEM vehicle data, empowering shops with legally accessible, aggregated vehicle information, tools, and workflows.
-
 ## 🚗 Overview
 
 RepairBridge is a modern web application that provides independent auto repair shops with:
