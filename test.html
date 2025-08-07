@@ -59,9 +59,9 @@
     <h1>RepairBridge Platform Test</h1>
     <div class="container">
         <div class="nav">
-            <button class="active" onclick="showContent('dashboard')">Dashboard</button>
-            <button onclick="showContent('data')">Data Hub</button>
-            <button onclick="showContent('diagnostics')">Diagnostics</button>
+            <button class="active" onclick="showContent(event, 'dashboard')">Dashboard</button>
+            <button onclick="showContent(event, 'data')">Data Hub</button>
+            <button onclick="showContent(event, 'diagnostics')">Diagnostics</button>
         </div>
         <div class="content" id="content">
             <h2>Dashboard</h2>
@@ -71,30 +71,40 @@
     </div>
 
     <script>
-        function showContent(section) {
+        function showContent(e, section) {
             const content = document.getElementById('content');
             const buttons = document.querySelectorAll('.nav button');
-            
+
             // Remove active class from all buttons
             buttons.forEach(btn => btn.classList.remove('active'));
-            
+
             // Add active class to clicked button
-            event.target.classList.add('active');
-            
+            e.target.classList.add('active');
+
+            let expectedHeading = '';
+
             // Update content based on section
             switch(section) {
                 case 'dashboard':
                     content.innerHTML = '<h2>Dashboard</h2><p>Vehicle management dashboard with stats and overview.</p>';
+                    expectedHeading = 'Dashboard';
                     break;
                 case 'data':
                     content.innerHTML = '<h2>Data Hub</h2><p>Access vehicle data from multiple OEM sources.</p>';
+                    expectedHeading = 'Data Hub';
                     break;
                 case 'diagnostics':
                     content.innerHTML = '<h2>AR Diagnostics</h2><p>Augmented reality powered vehicle diagnostics.</p>';
+                    expectedHeading = 'AR Diagnostics';
                     break;
             }
+
+            console.assert(
+                content.querySelector('h2').textContent === expectedHeading,
+                `Navigation to ${section} failed`
+            );
         }
-        
+
         console.log('Test page loaded successfully');
     </script>
 </body>
