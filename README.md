@@ -80,10 +80,23 @@ RepairBridge is a modern web application that provides independent auto repair s
 ### File Structure
 ```
 RepairBridge/
-├── index.html          # Main HTML structure
-├── styles.css          # CSS styles and animations
-├── script.js           # JavaScript functionality
-└── README.md          # This documentation
+├── index.html              # Main application layout
+├── index-working.html      # Prototype with navigation
+├── index-simple.html       # Simplified layout example
+├── minimal.html            # Minimal test harness
+├── ultra-simple.html       # Barebones prototype
+├── fixed.html              # Layout fix prototype
+├── debug.html              # Debugging page
+├── test.html               # Feature testing page
+├── styles.css              # Core styles and animations
+├── enhanced-styles.css     # Additional styling experiments
+├── layout-fix.css          # Layout adjustments
+├── script.js               # Main JavaScript logic
+├── script-simple.js        # Simplified prototype scripts
+├── modules/                # Reusable JavaScript modules
+├── src/                    # Source utilities and assets
+├── data/                   # Sample dataset files
+└── README.md               # Project documentation
 ```
 
 ## 📋 Features Walkthrough
