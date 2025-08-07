@@ -3,6 +3,35 @@
  * Handles vehicle data search and retrieval functionality
  */
 
+// Basic HTML sanitizer to prevent injection attacks
+function sanitizeHTML(str) {
+    return String(str).replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    })[char]);
+}
+
+// Recursively sanitize all string properties of an object
+function sanitizeObject(obj) {
+    if (typeof obj === 'string') {
+        return sanitizeHTML(obj);
+    }
+    if (Array.isArray(obj)) {
+        return obj.map(sanitizeObject);
+    }
+    if (obj && typeof obj === 'object') {
+        const sanitized = {};
+        for (const [key, value] of Object.entries(obj)) {
+            sanitized[key] = sanitizeObject(value);
+        }
+        return sanitized;
+    }
+    return obj;
+}
+
 class VehicleLookup {
     constructor() {
         this.searchResults = [];
@@ -190,17 +219,18 @@ class VehicleLookup {
     createResultItem(vehicle, index) {
         const resultItem = document.createElement('div');
         resultItem.className = 'result-item';
-        
-        const hasActiveCodes = vehicle.diagnosticCodes && vehicle.diagnosticCodes.length > 0;
+
+        const safeVehicle = sanitizeObject(vehicle);
+        const hasActiveCodes = safeVehicle.diagnosticCodes && safeVehicle.diagnosticCodes.length > 0;
         const statusClass = hasActiveCodes ? 'warning' : 'success';
         const statusText = hasActiveCodes ? 'Needs Attention' : 'Good';
 
         resultItem.innerHTML = `
             <div class="result-header">
                 <div class="vehicle-info">
-                    <h4>${vehicle.year} ${vehicle.make} ${vehicle.model}</h4>
-                    <p class="vin">VIN: ${vehicle.vin}</p>
-                    <p class="details">${vehicle.engine} • ${vehicle.mileage.toLocaleString()} miles</p>
+                    <h4>${safeVehicle.year} ${safeVehicle.make} ${safeVehicle.model}</h4>
+                    <p class="vin">VIN: ${safeVehicle.vin}</p>
+                    <p class="details">${safeVehicle.engine} • ${safeVehicle.mileage.toLocaleString()} miles</p>
                 </div>
                 <div class="result-actions">
                     <span class="status-badge ${statusClass}">${statusText}</span>
@@ -213,15 +243,15 @@ class VehicleLookup {
             <div class="result-summary">
                 <div class="summary-item">
                     <i class="fas fa-user"></i>
-                    <span>Owner: ${vehicle.owner.name}</span>
+                    <span>Owner: ${safeVehicle.owner.name}</span>
                 </div>
                 <div class="summary-item">
                     <i class="fas fa-wrench"></i>
-                    <span>Last Service: ${vehicle.serviceHistory.length > 0 ? vehicle.serviceHistory[0].date : 'No records'}</span>
+                    <span>Last Service: ${safeVehicle.serviceHistory.length > 0 ? safeVehicle.serviceHistory[0].date : 'No records'}</span>
                 </div>
                 <div class="summary-item">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <span>Diagnostic Codes: ${vehicle.diagnosticCodes.length}</span>
+                    <span>Diagnostic Codes: ${safeVehicle.diagnosticCodes.length}</span>
                 </div>
             </div>
         `;
@@ -239,10 +269,10 @@ class VehicleLookup {
      * Show detailed vehicle information
      */
     showVehicleDetails(vehicle) {
-        this.currentVehicle = vehicle;
-        
+        this.currentVehicle = sanitizeObject(vehicle);
+
         // Create modal for vehicle details
-        const modal = this.createDetailsModal(vehicle);
+        const modal = this.createDetailsModal(this.currentVehicle);
         document.body.appendChild(modal);
         
         // Show modal
