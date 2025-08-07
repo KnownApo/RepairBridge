@@ -78,6 +78,13 @@ class VehicleLookup {
     async performSearch() {
         const searchInput = document.querySelector('.search-input');
         const searchSelect = document.querySelector('.search-select');
+
+        // Ensure search elements exist before accessing their values
+        if (!searchInput || !searchSelect) {
+            console.error('Search input elements not found');
+            return;
+        }
+
         const query = searchInput.value.trim();
         const makeFilter = searchSelect.value;
 
