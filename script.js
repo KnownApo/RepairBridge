@@ -317,13 +317,16 @@ function updateRealTimeData() {
     
     dataValues.forEach(value => {
         const currentText = value.textContent;
-        
+
         if (currentText.includes('RPM')) {
-            value.textContent = (Math.floor(Math.random() * 1000) + 2000).toLocaleString();
+            const newValue = (Math.floor(Math.random() * 1000) + 2000).toLocaleString();
+            value.textContent = newValue + ' RPM';
         } else if (currentText.includes('°F')) {
-            value.textContent = (Math.floor(Math.random() * 20) + 185) + '°F';
+            const newValue = Math.floor(Math.random() * 20) + 185;
+            value.textContent = newValue + '°F';
         } else if (currentText.includes('PSI')) {
-            value.textContent = (Math.floor(Math.random() * 10) + 40) + ' PSI';
+            const newValue = Math.floor(Math.random() * 10) + 40;
+            value.textContent = newValue + ' PSI';
         }
     });
 }
