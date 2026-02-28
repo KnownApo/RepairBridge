@@ -75,7 +75,8 @@ RepairBridge is a modern web application that provides independent auto repair s
 1. Clone or download the project files
 2. Open `index.html` in a web browser
 3. For local development, serve files through a local web server (recommended)
-   - Example: `python -m http.server 8080` then open `http://localhost:8080/RepairBridge/`
+   - Quick dev server: `npm run dev` (uses `http-server` on port 8080)
+   - Or: `python -m http.server 8080`
 
 **Note:** older prototype pages are kept under `/prototypes`.
 
