@@ -87,11 +87,10 @@ RepairBridge/
 ├── enhanced-styles.css     # Additional styling experiments
 ├── layout-fix.css          # Layout adjustments
 ├── script.js               # Main JavaScript logic
-├── script-simple.js        # Simplified prototype scripts
+├── prototypes/             # Archived prototype pages and scripts
 ├── modules/                # Reusable JavaScript modules
 ├── src/                    # Source utilities and assets
 ├── data/                   # Sample dataset files
-├── prototypes/             # Archived prototype pages (moved here)
 └── README.md               # Project documentation
 ```
 

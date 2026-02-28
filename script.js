@@ -942,57 +942,57 @@ function initializeSectionFunctionality(sectionId) {
             loadARDiagnostics();
             break;
         case 'marketplace':
-            if (window.marketplace) {
-                window.marketplace.init();
+            if (window.marketplaceManager && window.marketplaceManager.renderMarketplaceItems) {
+                window.marketplaceManager.renderMarketplaceItems();
             }
             break;
         case 'inventory':
-            if (window.inventoryManager) {
+            if (window.inventoryManager && window.inventoryManager.loadInventoryData) {
                 window.inventoryManager.loadInventoryData();
             }
             break;
         case 'analytics':
-            if (window.analyticsManager) {
+            if (window.analyticsManager && window.analyticsManager.loadAnalytics) {
                 window.analyticsManager.loadAnalytics();
             }
             break;
         case 'notifications':
-            if (window.notificationManager) {
+            if (window.notificationManager && window.notificationManager.loadNotifications) {
                 window.notificationManager.loadNotifications();
             }
             break;
         case 'reporting':
-            if (window.reportingSystem) {
+            if (window.reportingSystem && window.reportingSystem.loadReportingInterface) {
                 window.reportingSystem.loadReportingInterface();
             }
             break;
         case 'help':
-            if (window.helpSystem) {
+            if (window.helpSystem && window.helpSystem.loadHelpInterface) {
                 window.helpSystem.loadHelpInterface();
             }
             break;
         case 'settings':
-            if (window.settingsManager) {
+            if (window.settingsManager && window.settingsManager.loadSettingsInterface) {
                 window.settingsManager.loadSettingsInterface();
             }
             break;
         case 'backup':
-            if (window.backupManager) {
+            if (window.backupManager && window.backupManager.loadBackupInterface) {
                 window.backupManager.loadBackupInterface();
             }
             break;
         case 'audit':
-            if (window.auditManager) {
+            if (window.auditManager && window.auditManager.loadAuditInterface) {
                 window.auditManager.loadAuditInterface();
             }
             break;
         case 'api':
-            if (window.apiManager) {
+            if (window.apiManager && window.apiManager.loadAPIInterface) {
                 window.apiManager.loadAPIInterface();
             }
             break;
         case 'fleet':
-            if (window.fleetManager) {
+            if (window.fleetManager && window.fleetManager.loadFleetInterface) {
                 window.fleetManager.loadFleetInterface();
             }
             break;
