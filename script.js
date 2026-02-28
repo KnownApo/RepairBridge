@@ -80,11 +80,12 @@ function initializeNavigation() {
  */
 function initializeInteractiveComponents() {
     
-    // Quick action buttons
+    // Quick action buttons (skip inline onclick to avoid double-handling)
     const quickActionButtons = document.querySelectorAll('.action-btn');
     quickActionButtons.forEach(button => {
+        if (button.getAttribute('onclick')) return;
         button.addEventListener('click', function() {
-            const action = this.textContent.trim();
+            const action = this.dataset.action || this.textContent.trim();
             handleQuickAction(action);
         });
     });
@@ -146,14 +147,14 @@ function initializeDataRefresh() {
  * Handles vehicle data search and filtering
  */
 function initializeSearch() {
-    const searchButton = document.querySelector('.search-btn');
-    const searchInput = document.querySelector('.search-input');
-    const searchSelect = document.querySelector('.search-select');
+    const searchButton = document.querySelector('.search-btn') || document.getElementById('search-btn');
+    const searchInput = document.querySelector('.search-input') || document.getElementById('vehicle-search');
+    const searchSelect = document.querySelector('.search-select') || document.getElementById('make-filter');
     
     if (searchButton) {
         searchButton.addEventListener('click', function() {
-            const query = searchInput.value.trim();
-            const make = searchSelect.value;
+            const query = searchInput ? searchInput.value.trim() : '';
+            const make = searchSelect ? searchSelect.value : 'All Makes';
             
             if (query) {
                 performVehicleSearch(query, make);
@@ -164,7 +165,7 @@ function initializeSearch() {
     }
     
     // Enable search on Enter key
-    if (searchInput) {
+    if (searchInput && searchButton) {
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 searchButton.click();
@@ -309,7 +310,10 @@ function updateDataSources() {
     if (progressBar) {
         const newWidth = Math.min(100, Math.floor(Math.random() * 20) + 75);
         progressBar.style.width = newWidth + '%';
-        progressBar.parentElement.nextElementSibling.textContent = newWidth + '% of monthly quota';
+        const quotaLabel = progressBar.parentElement ? progressBar.parentElement.nextElementSibling : null;
+        if (quotaLabel) {
+            quotaLabel.textContent = newWidth + '% of monthly quota';
+        }
     }
 }
 
