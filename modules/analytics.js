@@ -912,6 +912,3 @@ class AnalyticsManager {
 
 // Initialize analytics manager
 window.analyticsManager = new AnalyticsManager();
-
-// Initialize analytics when the module loads
-window.analyticsManager = new AnalyticsManager();

@@ -1,11 +1,28 @@
 /* RepairBridge Platform Styles */
 /* Modern CSS with Glassmorphism Effects */
 
+:root {
+    --rb-focus: #38bdf8;
+}
+
 /* CSS Reset and Base Styles */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+*:focus-visible {
+    outline: 2px solid var(--rb-focus);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
 }
 
 body {
