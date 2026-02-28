@@ -531,7 +531,8 @@ async function performVehicleSearch(query, make) {
         const vinData = await fetchVinData(vin);
         const recalls = await fetchRecalls(vinData);
         const complaints = await fetchComplaints(vinData);
-        displayVinResults(vinData, recalls, complaints);
+        const tsbs = await fetchTsbs(vinData);
+        displayVinResults(vinData, recalls, complaints, tsbs);
         return;
     }
 
@@ -649,12 +650,26 @@ async function fetchComplaints(vinData) {
     }
 }
 
-function displayVinResults(vinData, recalls, complaints) {
+async function fetchTsbs(vinData) {
+    if (!vinData || vinData.make === 'Unknown') return null;
+    const { make, model, year } = vinData;
+    try {
+        const url = `https://api.nhtsa.gov/tsbs/tsbsByVehicle?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&modelYear=${encodeURIComponent(year)}`;
+        const data = await safeFetchJson(url);
+        return data?.results || [];
+    } catch (err) {
+        console.warn('TSB fetch failed', err);
+        return null; // null indicates unavailable
+    }
+}
+
+function displayVinResults(vinData, recalls, complaints, tsbs) {
     const container = document.getElementById('search-results');
     if (!container) return;
 
     const recallCount = recalls.length;
     const complaintCount = complaints.length;
+    const tsbCount = Array.isArray(tsbs) ? tsbs.length : null;
 
     const recallList = recalls.slice(0, 5).map(r => (
         `<li>${r.Component || 'Recall'} — ${r.Summary || 'Details available'}</li>`
@@ -663,6 +678,10 @@ function displayVinResults(vinData, recalls, complaints) {
     const complaintList = complaints.slice(0, 5).map(c => (
         `<li>${c.Component || 'Complaint'} — ${c.Summary || 'Details available'}</li>`
     )).join('') || '<li>No complaints found</li>';
+
+    const tsbList = Array.isArray(tsbs)
+        ? (tsbs.slice(0, 5).map(t => (`<li>${t.Component || 'TSB'} — ${t.Summary || 'Details available'}</li>`)).join('') || '<li>No TSBs found</li>')
+        : '<li>TSB data unavailable (no free public endpoint)</li>';
 
     container.innerHTML = `
         <div class="source-item">
@@ -675,7 +694,7 @@ function displayVinResults(vinData, recalls, complaints) {
         </div>
         <div class="source-item">
             <span>Recalls: ${recallCount}</span>
-            <small>Complaints: ${complaintCount}</small>
+            <small>Complaints: ${complaintCount}${tsbCount !== null ? ` • TSBs: ${tsbCount}` : ''}</small>
         </div>
         <div class="widget" style="margin-top:16px;">
             <h4 style="color:#fff;margin-bottom:8px;">Top Recalls</h4>
@@ -685,10 +704,65 @@ function displayVinResults(vinData, recalls, complaints) {
             <h4 style="color:#fff;margin-bottom:8px;">Top Complaints</h4>
             <ul style="color:#fff; padding-left:18px;">${complaintList}</ul>
         </div>
+        <div class="widget" style="margin-top:16px;">
+            <h4 style="color:#fff;margin-bottom:8px;">TSB Bulletins (best effort)</h4>
+            <ul style="color:#fff; padding-left:18px;">${tsbList}</ul>
+        </div>
+        <div class="widget" style="margin-top:16px;">
+            <h4 style="color:#fff;margin-bottom:8px;">Repair Estimate (placeholder)</h4>
+            <p style="color:#fff;">Labor & procedure data require paid OEM sources. This panel is ready for API integration.</p>
+            <ul style="color:#fff; padding-left:18px;">
+                <li>Labor hours: —</li>
+                <li>Parts estimate: —</li>
+                <li>Total estimate: —</li>
+            </ul>
+        </div>
+        <button type="button" class="action-btn" style="margin-top:16px;" onclick="downloadVinReport()">⬇️ Download VIN Report</button>
     `;
+
+    window._rb_lastVinReport = { vinData, recalls, complaints, tsbs };
 
     showNotification(`VIN lookup complete — ${recallCount} recalls, ${complaintCount} complaints`, 'success');
 }
+
+function downloadVinReport() {
+    const payload = window._rb_lastVinReport;
+    if (!payload) {
+        showNotification('Run a VIN search first', 'warning');
+        return;
+    }
+    const { vinData, recalls, complaints, tsbs } = payload;
+
+    const lines = [];
+    lines.push(`RepairBridge VIN Report`);
+    lines.push(`VIN: ${vinData.vin}`);
+    lines.push(`Vehicle: ${vinData.year} ${vinData.make} ${vinData.model} (${vinData.trim})`);
+    lines.push(`Body: ${vinData.body} | Engine: ${vinData.engine}`);
+    lines.push('');
+    lines.push(`Recalls (${recalls.length}):`);
+    recalls.forEach(r => lines.push(`- ${r.Component || 'Recall'}: ${r.Summary || 'Details available'}`));
+    lines.push('');
+    lines.push(`Complaints (${complaints.length}):`);
+    complaints.forEach(c => lines.push(`- ${c.Component || 'Complaint'}: ${c.Summary || 'Details available'}`));
+    lines.push('');
+    if (Array.isArray(tsbs)) {
+        lines.push(`TSBs (${tsbs.length}):`);
+        tsbs.forEach(t => lines.push(`- ${t.Component || 'TSB'}: ${t.Summary || 'Details available'}`));
+    } else {
+        lines.push('TSBs: unavailable (no free public endpoint)');
+    }
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `vin-report-${vinData.vin}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// expose for inline onclick
+window.downloadVinReport = downloadVinReport;
 
 /**
  * Starts AR diagnostic session
