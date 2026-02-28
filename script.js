@@ -5,6 +5,10 @@
  * Version: 1.0.0
  */
 
+// Global state
+let cartItems = 0;
+let isARActive = false;
+
 // Initialize the application when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
@@ -1032,3 +1036,121 @@ function initializeBlockchainSection() {
 
 // Make the enhanced showSection function globally available
 window.showSection = showSection;
+
+// --- Compatibility layer for legacy inline handlers (index.html) ---
+function quickAction(action) {
+    switch (action) {
+        case 'diagnostic':
+            showNotification('Starting new diagnostic session...', 'info');
+            if (document.querySelector('[data-section="ar-diagnostics"]')) {
+                showSection('ar-diagnostics');
+            }
+            setTimeout(() => {
+                showNotification('Diagnostic tools ready!', 'success');
+            }, 1500);
+            break;
+        case 'sync':
+            showNotification('Syncing data sources...', 'info');
+            updateDataSources();
+            setTimeout(() => {
+                showNotification('All data sources synchronized!', 'success');
+            }, 1200);
+            break;
+        case 'report':
+            showNotification('Generating compliance report...', 'info');
+            generateComplianceReport();
+            break;
+        default:
+            showNotification('Action not implemented yet', 'warning');
+    }
+}
+
+function searchVehicle() {
+    const queryEl = document.getElementById('vehicle-search');
+    const makeEl = document.getElementById('make-filter');
+    const query = queryEl ? queryEl.value.trim() : '';
+    const make = makeEl ? makeEl.value : 'All Makes';
+
+    if (!query) {
+        showNotification('Please enter a VIN or License Plate', 'warning');
+        return;
+    }
+
+    performVehicleSearch(query, make);
+}
+
+function updateLiveData() {
+    showNotification('Refreshing live data...', 'info');
+    setTimeout(() => {
+        const rpm = document.getElementById('rpm-value');
+        const temp = document.getElementById('temp-value');
+        const pressure = document.getElementById('pressure-value');
+
+        if (rpm) rpm.textContent = (Math.floor(Math.random() * 1000) + 2000).toLocaleString();
+        if (temp) temp.textContent = (Math.floor(Math.random() * 20) + 185) + '°F';
+        if (pressure) pressure.textContent = (Math.floor(Math.random() * 10) + 40) + ' PSI';
+
+        showNotification('Live data updated!', 'success');
+    }, 800);
+}
+
+function refreshData() {
+    showNotification('Refreshing data sources...', 'info');
+    setTimeout(() => {
+        updateDataSources();
+        showNotification('Data sources refreshed!', 'success');
+    }, 1000);
+}
+
+function toggleAR() {
+    const button = document.getElementById('ar-toggle');
+    const status = document.getElementById('ar-status');
+    const viewport = document.getElementById('ar-viewport');
+
+    if (!button || !status || !viewport) {
+        showNotification('AR UI elements missing', 'warning');
+        return;
+    }
+
+    if (!isARActive) {
+        showNotification('Initializing AR camera...', 'info');
+        button.innerHTML = '⏸️ Stop AR Session';
+        status.innerHTML = 'Active';
+        status.className = 'status-badge active';
+
+        setTimeout(() => {
+            viewport.innerHTML = `
+                <h3>📹 AR Session Active</h3>
+                <p>Camera overlay enabled - Point at vehicle component</p>
+                <button type="button" class="action-btn" onclick="toggleAR()" id="ar-toggle">
+                    ⏸️ Stop AR Session
+                </button>
+            `;
+            showNotification('AR session started successfully!', 'success');
+        }, 1200);
+
+        isARActive = true;
+    } else {
+        showNotification('Stopping AR session...', 'info');
+        button.innerHTML = '▶️ Start AR Session';
+        status.innerHTML = 'Ready';
+
+        viewport.innerHTML = `
+            <h3>📷 AR Camera View</h3>
+            <p>Position camera toward vehicle component</p>
+            <button type="button" class="action-btn" onclick="toggleAR()" id="ar-toggle">
+                ▶️ Start AR Session
+            </button>
+        `;
+
+        showNotification('AR session stopped', 'info');
+        isARActive = false;
+    }
+}
+
+// Expose legacy handlers globally
+window.quickAction = quickAction;
+window.searchVehicle = searchVehicle;
+window.updateLiveData = updateLiveData;
+window.refreshData = refreshData;
+window.toggleAR = toggleAR;
