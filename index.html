@@ -830,7 +830,7 @@
         let cartItems = 0;
         let isARActive = false;
 
-        function showSection(sectionId) {
+        function showSection(sectionId, evt = null) {
             // Hide all sections
             document.querySelectorAll('.content-section').forEach(section => {
                 section.classList.remove('active');
@@ -846,8 +846,13 @@
             if (targetSection) {
                 targetSection.classList.add('active');
                 
-                // Add active class to clicked button
-                event.target.classList.add('active');
+                // Add active class to corresponding nav button
+                const navBtn = document.querySelector(`[data-section="${sectionId}"]`);
+                if (navBtn) {
+                    navBtn.classList.add('active');
+                } else if (evt && evt.target) {
+                    evt.target.classList.add('active');
+                }
                 
                 // Show notification
                 showNotification(`Switched to ${sectionId.replace('-', ' ')}`, 'info');
@@ -998,9 +1003,13 @@
             
             // Simulate data updates
             setTimeout(() => {
-                document.getElementById('rpm-value').textContent = (Math.floor(Math.random() * 1000) + 2000).toLocaleString();
-                document.getElementById('temp-value').textContent = (Math.floor(Math.random() * 20) + 185) + '°F';
-                document.getElementById('pressure-value').textContent = (Math.floor(Math.random() * 10) + 40) + ' PSI';
+                const rpm = document.getElementById('rpm-value');
+                const temp = document.getElementById('temp-value');
+                const pressure = document.getElementById('pressure-value');
+
+                if (rpm) rpm.textContent = (Math.floor(Math.random() * 1000) + 2000).toLocaleString();
+                if (temp) temp.textContent = (Math.floor(Math.random() * 20) + 185) + '°F';
+                if (pressure) pressure.textContent = (Math.floor(Math.random() * 10) + 40) + ' PSI';
                 
                 showNotification('Live data updated!', 'success');
                 addActivity('📊 Live data refreshed');
@@ -1102,11 +1111,24 @@
             // Start live data updates
             setInterval(updateLiveData, 30000); // Update every 30 seconds
 
-            // Setup search on Enter key
-            document.getElementById('vehicle-search').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    searchVehicle();
-                }
+            // Setup search on Enter key (if input exists)
+            const vehicleSearch = document.getElementById('vehicle-search');
+            if (vehicleSearch) {
+                vehicleSearch.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        searchVehicle();
+                    }
+                });
+            }
+
+            // Wire nav buttons to showSection
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    const target = this.getAttribute('data-section');
+                    if (target) {
+                        showSection(target, e);
+                    }
+                });
             });
         });
     </script>
