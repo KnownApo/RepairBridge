@@ -521,15 +521,24 @@ function updateRealTimeData() {
  * @param {string} query - Search query (VIN or license plate)
  * @param {string} make - Vehicle make filter
  */
-function performVehicleSearch(query, make) {
+async function performVehicleSearch(query, make) {
     showNotification('Searching vehicle database...', 'info');
-    
-    // Simulate search delay
-    setTimeout(() => {
-        const results = generateMockSearchResults(query, make);
-        displaySearchResults(results);
-        showNotification(`Found ${results.length} matching vehicles`, 'success');
-    }, 2000);
+
+    const isVin = query.replace(/[^A-Za-z0-9]/g, '').length >= 11;
+
+    if (isVin) {
+        const vin = query.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+        const vinData = await fetchVinData(vin);
+        const recalls = await fetchRecalls(vinData);
+        const complaints = await fetchComplaints(vinData);
+        displayVinResults(vinData, recalls, complaints);
+        return;
+    }
+
+    // Fallback to demo results for non-VIN searches
+    const results = generateMockSearchResults(query, make);
+    displaySearchResults(results);
+    showNotification(`Found ${results.length} matching vehicles`, 'success');
 }
 
 /**
@@ -568,21 +577,117 @@ function generateMockSearchResults(query, make) {
  * @param {Array} results - Search results to display
  */
 function displaySearchResults(results) {
-    // This would typically update a results container
-    console.log('Search results:', results);
-    
-    // Add results to activity log
-    const activityList = document.querySelector('.activity-list');
-    if (activityList) {
-        const newActivity = document.createElement('div');
-        newActivity.className = 'activity-item';
-        newActivity.innerHTML = `
-            <i class="fas fa-search"></i>
-            <span>Vehicle search completed</span>
-            <small>Just now</small>
-        `;
-        activityList.insertBefore(newActivity, activityList.firstChild);
+    const container = document.getElementById('search-results');
+    if (!container) return;
+
+    if (!results || results.length === 0) {
+        container.innerHTML = '<div class="loading-placeholder">No vehicles found</div>';
+        return;
     }
+
+    let html = '<h4 style="color: white; margin-bottom: 16px;">Search Results:</h4>';
+    results.forEach(result => {
+        html += `
+            <div class="source-item">
+                <span>🚗 ${result.year} ${result.make} ${result.model}</span>
+                <small>VIN: ${result.vin} • Status: ${result.status}</small>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+async function safeFetchJson(url) {
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+}
+
+async function fetchVinData(vin) {
+    try {
+        const data = await safeFetchJson(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvaluesextended/${vin}?format=json`);
+        const row = data?.Results?.[0] || {};
+        return {
+            vin,
+            make: row.Make || 'Unknown',
+            model: row.Model || 'Unknown',
+            year: row.ModelYear || 'Unknown',
+            trim: row.Trim || row.Series || '—',
+            body: row.BodyClass || '—',
+            engine: row.EngineModel || row.EngineCylinders || '—'
+        };
+    } catch (err) {
+        console.warn('VIN decode failed', err);
+        return { vin, make: 'Unknown', model: 'Unknown', year: 'Unknown', trim: '—', body: '—', engine: '—' };
+    }
+}
+
+async function fetchRecalls(vinData) {
+    if (!vinData || vinData.make === 'Unknown') return [];
+    const { make, model, year } = vinData;
+    try {
+        const url = `https://api.nhtsa.gov/recalls/recallsByVehicle?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&modelYear=${encodeURIComponent(year)}`;
+        const data = await safeFetchJson(url);
+        return data?.results || [];
+    } catch (err) {
+        console.warn('Recall fetch failed', err);
+        return [];
+    }
+}
+
+async function fetchComplaints(vinData) {
+    if (!vinData || vinData.make === 'Unknown') return [];
+    const { make, model, year } = vinData;
+    try {
+        const url = `https://api.nhtsa.gov/complaints/complaintsByVehicle?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&modelYear=${encodeURIComponent(year)}`;
+        const data = await safeFetchJson(url);
+        return data?.results || [];
+    } catch (err) {
+        console.warn('Complaints fetch failed', err);
+        return [];
+    }
+}
+
+function displayVinResults(vinData, recalls, complaints) {
+    const container = document.getElementById('search-results');
+    if (!container) return;
+
+    const recallCount = recalls.length;
+    const complaintCount = complaints.length;
+
+    const recallList = recalls.slice(0, 5).map(r => (
+        `<li>${r.Component || 'Recall'} — ${r.Summary || 'Details available'}</li>`
+    )).join('') || '<li>No recalls found</li>';
+
+    const complaintList = complaints.slice(0, 5).map(c => (
+        `<li>${c.Component || 'Complaint'} — ${c.Summary || 'Details available'}</li>`
+    )).join('') || '<li>No complaints found</li>';
+
+    container.innerHTML = `
+        <div class="source-item">
+            <span>🚗 ${vinData.year} ${vinData.make} ${vinData.model}</span>
+            <small>VIN: ${vinData.vin} • Trim: ${vinData.trim}</small>
+        </div>
+        <div class="source-item">
+            <span>Body: ${vinData.body}</span>
+            <small>Engine: ${vinData.engine}</small>
+        </div>
+        <div class="source-item">
+            <span>Recalls: ${recallCount}</span>
+            <small>Complaints: ${complaintCount}</small>
+        </div>
+        <div class="widget" style="margin-top:16px;">
+            <h4 style="color:#fff;margin-bottom:8px;">Top Recalls</h4>
+            <ul style="color:#fff; padding-left:18px;">${recallList}</ul>
+        </div>
+        <div class="widget" style="margin-top:16px;">
+            <h4 style="color:#fff;margin-bottom:8px;">Top Complaints</h4>
+            <ul style="color:#fff; padding-left:18px;">${complaintList}</ul>
+        </div>
+    `;
+
+    showNotification(`VIN lookup complete — ${recallCount} recalls, ${complaintCount} complaints`, 'success');
 }
 
 /**
