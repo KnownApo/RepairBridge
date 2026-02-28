@@ -74,19 +74,14 @@ RepairBridge is a modern web application that provides independent auto repair s
 
 1. Clone or download the project files
 2. Open `index.html` in a web browser
-3. For local development, serve files through a local web server
+3. For local development, serve files through a local web server (recommended)
+
+**Note:** older prototype pages are kept under `/prototypes`.
 
 ### File Structure
 ```
 RepairBridge/
-├── index.html              # Main application layout
-├── index-working.html      # Prototype with navigation
-├── index-simple.html       # Simplified layout example
-├── minimal.html            # Minimal test harness
-├── ultra-simple.html       # Barebones prototype
-├── fixed.html              # Layout fix prototype
-├── debug.html              # Debugging page
-├── test.html               # Feature testing page
+├── index.html              # Main application layout (canonical entry)
 ├── styles.css              # Core styles and animations
 ├── enhanced-styles.css     # Additional styling experiments
 ├── layout-fix.css          # Layout adjustments
@@ -95,6 +90,7 @@ RepairBridge/
 ├── modules/                # Reusable JavaScript modules
 ├── src/                    # Source utilities and assets
 ├── data/                   # Sample dataset files
+├── prototypes/             # Archived prototype pages (moved here)
 └── README.md               # Project documentation
 ```
 
