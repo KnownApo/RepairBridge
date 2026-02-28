@@ -89,7 +89,8 @@ RepairBridge/
 ├── layout-fix.css          # Layout adjustments
 ├── script.js               # Main JavaScript logic
 ├── prototypes/             # Archived prototype pages and scripts
-├── modules/                # Reusable JavaScript modules
+├── modules/                # Active JavaScript modules
+├── modules/unused/         # Archived/unused modules
 ├── src/                    # Source utilities and assets
 ├── data/                   # Sample dataset files
 └── README.md               # Project documentation
@@ -128,6 +129,10 @@ RepairBridge/
 - Audit trail maintenance
 
 ## 🔧 Customization
+
+### Data
+- Demo data lives in `data/repairbridge.json`
+- Update stats, sources, marketplace items, inventory, analytics, and compliance values there
 
 ### Styling
 - Colors can be modified in the CSS custom properties
