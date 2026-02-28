@@ -40,25 +40,25 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-content">
-                        <h3>156</h3>
+                        <h3 data-stat="vehicles">156</h3>
                         <p>Vehicles Serviced</p>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-content">
-                        <h3>23</h3>
+                        <h3 data-stat="sources">23</h3>
                         <p>Data Sources</p>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-content">
-                        <h3>8</h3>
+                        <h3 data-stat="diagnostics">8</h3>
                         <p>Active Diagnostics</p>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-content">
-                        <h3>100%</h3>
+                        <h3 data-stat="compliance">100%</h3>
                         <p>Compliance Rate</p>
                     </div>
                 </div>
@@ -112,7 +112,7 @@
                         <h3>OEM Data Feeds</h3>
                         <span class="status-badge active">Active</span>
                     </div>
-                    <div class="source-list">
+                    <div class="source-list" id="oem-source-list">
                         <div class="source-item">
                             <span class="connected">🟢</span>
                             <span>Ford Motor Company</span>
@@ -141,7 +141,7 @@
                         <h3>Data Analytics</h3>
                         <button type="button" class="action-btn" onclick="refreshData()">🔄 Refresh</button>
                     </div>
-                    <div class="loading-placeholder">
+                    <div class="loading-placeholder" id="data-analytics-metrics">
                         <h4>Data Volume: 78% of monthly quota</h4>
                         <h4>Processing Speed: 2.3s avg</h4>
                         <h4>Active Connections: 3/4</h4>
@@ -238,7 +238,7 @@
                 <p>Access tools and training with group discounts</p>
             </div>
 
-            <div class="marketplace-grid">
+            <div class="marketplace-grid" id="marketplace-grid">
                 <div class="marketplace-item">
                     <div class="item-info">
                         <h4>🔍 OBD-II Scanner Pro</h4>
@@ -306,7 +306,7 @@
                 <h2>📦 Inventory</h2>
                 <p>Parts inventory and supplier management</p>
             </div>
-            <div class="loading-placeholder">
+            <div class="loading-placeholder" id="inventory-panel">
                 <h3>Inventory System</h3>
                 <p>Stock tracking, auto-reorder, supplier integration</p>
             </div>
@@ -317,7 +317,7 @@
                 <h2>📈 Analytics</h2>
                 <p>Performance metrics and insights</p>
             </div>
-            <div class="loading-placeholder">
+            <div class="loading-placeholder" id="analytics-panel">
                 <h3>Analytics Dashboard</h3>
                 <p>Revenue tracking, efficiency metrics, predictive analytics</p>
             </div>
@@ -328,7 +328,7 @@
                 <h2>🛡️ Compliance</h2>
                 <p>Security monitoring and compliance</p>
             </div>
-            <div class="loading-placeholder">
+            <div class="loading-placeholder" id="compliance-panel">
                 <h3>Compliance Vault</h3>
                 <p>AES-256 encryption, audit trails, GDPR compliance</p>
             </div>
@@ -355,20 +355,7 @@
     <script src="modules/analytics.js"></script>
     <script src="modules/marketplace.js"></script>
     <script src="modules/inventory-manager.js"></script>
-    <script src="modules/reporting-system.js"></script>
-    <script src="modules/help-system.js"></script>
     <script src="modules/settings-manager.js"></script>
-    <script src="modules/backup-manager.js"></script>
-    <script src="modules/audit-manager.js"></script>
-    <script src="modules/api-manager.js"></script>
-    <script src="modules/fleet-manager.js"></script>
-    <script src="modules/work-order-manager.js"></script>
-    <script src="modules/user-manager.js"></script>
-    <script src="modules/integration-manager.js"></script>
-    <script src="modules/performance-tester.js"></script>
-    <script src="modules/ui-optimizer.js"></script>
-    <script src="modules/vehicle-lookup.js"></script>
-    <script src="modules/diagnostic.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

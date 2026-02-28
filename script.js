@@ -50,9 +50,186 @@ function initializeApp() {
     
     // Show welcome message
     showWelcomeMessage();
+
+    // Load demo data and hydrate UI
+    loadAppData();
     
     console.log('RepairBridge Platform initialized successfully!');
 }
+
+/**
+ * Data Loading
+ * Fetches demo data and hydrates UI
+ */
+let appData = null;
+
+async function loadAppData() {
+    try {
+        const res = await fetch('data/repairbridge.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to load data');
+        appData = await res.json();
+    } catch (err) {
+        console.warn('Falling back to built-in demo data:', err);
+        appData = getFallbackData();
+    }
+
+    hydrateDashboard();
+    hydrateDataAggregator();
+    hydrateMarketplace();
+    hydrateInventory();
+    hydrateAnalytics();
+    hydrateCompliance();
+}
+
+function getFallbackData() {
+    return {
+        stats: { vehicles: 150, sources: 10, diagnostics: 4, compliance: '98.7%' },
+        recentActivity: [
+            { text: '🔧 Honda Accord diagnostic completed', time: '1 hour ago' },
+            { text: '📥 GM data feed synced', time: '2 hours ago' },
+            { text: '✅ Compliance report generated', time: 'Today' }
+        ],
+        dataSources: [
+            { name: 'Ford Motor Company', status: 'connected', lastSync: '8 min ago' },
+            { name: 'General Motors', status: 'connected', lastSync: '12 min ago' },
+            { name: 'Toyota Motor Corp', status: 'connected', lastSync: '10 min ago' },
+            { name: 'BMW Group', status: 'disconnected', lastSync: 'Connection issue' }
+        ],
+        dataAnalytics: { quota: '80% of monthly quota', speed: '2.4s avg', connections: '3/4 active' },
+        marketplace: [],
+        inventory: { lowStock: [], suppliers: [] },
+        analytics: { monthlyRevenue: '$38,200', jobsCompleted: 112, avgCycleTime: '2.1 days' },
+        compliance: { lastAudit: '2026-02-01', openFindings: 1, nextReview: '2026-03-01' }
+    };
+}
+
+function hydrateDashboard() {
+    if (!appData) return;
+
+    document.querySelectorAll('[data-stat]').forEach(el => {
+        const key = el.getAttribute('data-stat');
+        if (appData.stats && appData.stats[key] !== undefined) {
+            el.textContent = appData.stats[key];
+        }
+    });
+
+    const activityList = document.getElementById('activity-list');
+    if (activityList && Array.isArray(appData.recentActivity)) {
+        activityList.innerHTML = appData.recentActivity.map(item => (
+            `<div class="activity-item"><span>${item.text}</span><small>${item.time}</small></div>`
+        )).join('');
+    }
+}
+
+function hydrateDataAggregator() {
+    if (!appData) return;
+
+    const list = document.getElementById('oem-source-list');
+    if (list && Array.isArray(appData.dataSources)) {
+        list.innerHTML = appData.dataSources.map(src => {
+            const statusClass = src.status === 'connected' ? 'connected' : 'disconnected';
+            const statusDot = src.status === 'connected' ? '🟢' : '🔴';
+            return `
+                <div class="source-item">
+                    <span class="${statusClass}">${statusDot}</span>
+                    <span>${src.name}</span>
+                    <small>Last sync: ${src.lastSync}</small>
+                </div>
+            `;
+        }).join('');
+    }
+
+    const metrics = document.getElementById('data-analytics-metrics');
+    if (metrics && appData.dataAnalytics) {
+        metrics.innerHTML = `
+            <h4>Data Volume: ${appData.dataAnalytics.quota}</h4>
+            <h4>Processing Speed: ${appData.dataAnalytics.speed}</h4>
+            <h4>Active Connections: ${appData.dataAnalytics.connections}</h4>
+        `;
+    }
+}
+
+function hydrateMarketplace() {
+    if (!appData || !Array.isArray(appData.marketplace)) return;
+    const grid = document.getElementById('marketplace-grid');
+    if (!grid || appData.marketplace.length === 0) return;
+
+    grid.innerHTML = appData.marketplace.map(item => {
+        const discountPct = Math.round(100 - (item.discount / item.original) * 100);
+        return `
+            <div class="marketplace-item">
+                <div class="item-info">
+                    <h4>🧰 ${item.name}</h4>
+                    <p>${item.desc}</p>
+                    <div class="price-info">
+                        <span class="original-price">$${item.original}</span>
+                        <span class="discount-price">$${item.discount}</span>
+                        <span class="discount-badge">${discountPct}% OFF</span>
+                    </div>
+                </div>
+                <button type="button" class="add-to-cart-btn" onclick="addToCart('${item.name}', '$${item.discount}')">
+                    🛒 Add to Cart
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+function hydrateInventory() {
+    if (!appData || !appData.inventory) return;
+    const panel = document.getElementById('inventory-panel');
+    if (!panel) return;
+
+    const lowStock = appData.inventory.lowStock || [];
+    const suppliers = appData.inventory.suppliers || [];
+
+    panel.innerHTML = `
+        <h3>Low Stock Alerts</h3>
+        <div class="activity-list">
+            ${lowStock.map(item => `<div class="activity-item"><span>${item.part}</span><small>Qty: ${item.qty}</small></div>`).join('')}
+        </div>
+        <h3 style="margin-top:16px;">Preferred Suppliers</h3>
+        <div class="activity-list">
+            ${suppliers.map(name => `<div class="activity-item"><span>${name}</span><small>Active</small></div>`).join('')}
+        </div>
+    `;
+}
+
+function hydrateAnalytics() {
+    if (!appData || !appData.analytics) return;
+    const panel = document.getElementById('analytics-panel');
+    if (!panel) return;
+
+    panel.innerHTML = `
+        <h3>Monthly Revenue</h3>
+        <p>${appData.analytics.monthlyRevenue}</p>
+        <h3 style="margin-top:12px;">Jobs Completed</h3>
+        <p>${appData.analytics.jobsCompleted}</p>
+        <h3 style="margin-top:12px;">Avg Cycle Time</h3>
+        <p>${appData.analytics.avgCycleTime}</p>
+    `;
+}
+
+function hydrateCompliance() {
+    if (!appData || !appData.compliance) return;
+    const panel = document.getElementById('compliance-panel');
+    if (!panel) return;
+
+    panel.innerHTML = `
+        <h3>Last Audit</h3>
+        <p>${appData.compliance.lastAudit}</p>
+        <h3 style="margin-top:12px;">Open Findings</h3>
+        <p>${appData.compliance.openFindings}</p>
+        <h3 style="margin-top:12px;">Next Review</h3>
+        <p>${appData.compliance.nextReview}</p>
+    `;
+}
+
+// Section loaders (used by navigation)
+function loadDashboardData() { hydrateDashboard(); }
+function loadDataAggregatorContent() { hydrateDataAggregator(); }
+function loadARDiagnostics() { /* placeholder for future camera binding */ }
+function loadComplianceContent() { hydrateCompliance(); }
 
 /**
  * Navigation System
@@ -772,13 +949,6 @@ window.stopARSession = stopARSession;
  * Initialize competitive features
  * Sets up AI diagnostics, telematics, blockchain, voice commands, and customer portal
  */
-function initializeCompetitiveFeatures() {
-    console.log('Initializing competitive features...');
-    
-    // Initialize AI diagnostic assistant
-    if (window.aiDiagnosticAssistant) {
-        window.aiDiagnosticAssistant.init();
-    }
     
     // Initialize telematics system
     if (window.telematicsSystem) {
@@ -829,39 +999,10 @@ function initializeCompetitiveFeatures() {
  * Setup voice commands context tracking
  * Updates voice context when navigating between sections
  */
-function setupVoiceContextTracking() {
-    if (!window.voiceCommandSystem) return;
-    
-    // Track navigation changes for voice context
-    const navButtons = document.querySelectorAll('.nav-btn');
-    navButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const section = this.dataset.section;
-            window.voiceCommandSystem.updateContext(section);
-        });
-    });
-}
 
 /**
  * Setup voice UI elements
  */
-function setupVoiceUI() {
-    const voiceInterface = document.getElementById('voice-interface');
-    if (!voiceInterface) return;
-    
-    // Show voice interface if voice commands are supported
-    if (window.voiceCommandSystem.isSupported()) {
-        voiceInterface.style.display = 'flex';
-        
-        // Setup voice button click handlers
-        const voiceButtons = document.querySelectorAll('.voice-control-btn, .voice-btn');
-        voiceButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                if (window.voiceCommandSystem.isListening) {
-                    window.voiceCommandSystem.stopListening();
-                } else {
-                    window.voiceCommandSystem.startListening();
-                }
             });
         });
     } else {
@@ -872,21 +1013,6 @@ function setupVoiceUI() {
 /**
  * Show customer portal demo
  */
-function showCustomerPortalDemo() {
-    // Get a sample customer for demo
-    const customers = Array.from(window.customerPortalSystem.customers.values());
-    if (customers.length > 0) {
-        const sampleCustomer = customers[0];
-        const dashboardHTML = window.customerPortalSystem.renderCustomerDashboard(sampleCustomer.id);
-        
-        const portalContainer = document.getElementById('customer-portal-data');
-        if (portalContainer) {
-            portalContainer.innerHTML = `
-                <div class="portal-demo-notice">
-                    <h3>Customer Portal Demo</h3>
-                    <p>This is a demonstration of the customer portal interface</p>
-                </div>
-                ${dashboardHTML}
             `;
         }
     }
@@ -956,63 +1082,13 @@ function initializeSectionFunctionality(sectionId) {
                 window.analyticsManager.loadAnalytics();
             }
             break;
-        case 'notifications':
-            if (window.notificationManager && window.notificationManager.loadNotifications) {
-                window.notificationManager.loadNotifications();
-            }
-            break;
-        case 'reporting':
-            if (window.reportingSystem && window.reportingSystem.loadReportingInterface) {
-                window.reportingSystem.loadReportingInterface();
-            }
-            break;
-        case 'help':
-            if (window.helpSystem && window.helpSystem.loadHelpInterface) {
-                window.helpSystem.loadHelpInterface();
-            }
+        case 'compliance':
+            loadComplianceContent();
             break;
         case 'settings':
             if (window.settingsManager && window.settingsManager.loadSettingsInterface) {
                 window.settingsManager.loadSettingsInterface();
             }
-            break;
-        case 'backup':
-            if (window.backupManager && window.backupManager.loadBackupInterface) {
-                window.backupManager.loadBackupInterface();
-            }
-            break;
-        case 'audit':
-            if (window.auditManager && window.auditManager.loadAuditInterface) {
-                window.auditManager.loadAuditInterface();
-            }
-            break;
-        case 'api':
-            if (window.apiManager && window.apiManager.loadAPIInterface) {
-                window.apiManager.loadAPIInterface();
-            }
-            break;
-        case 'fleet':
-            if (window.fleetManager && window.fleetManager.loadFleetInterface) {
-                window.fleetManager.loadFleetInterface();
-            }
-            break;
-        case 'telematics':
-            if (window.telematicsSystem) {
-                window.telematicsSystem.renderTelematicsData();
-            }
-            break;
-        case 'blockchain':
-            if (window.blockchainSystem) {
-                initializeBlockchainSection();
-            }
-            break;
-        case 'customer-portal':
-            if (window.customerPortalSystem) {
-                showCustomerPortalDemo();
-            }
-            break;
-        case 'compliance':
-            loadComplianceContent();
             break;
     }
 }
@@ -1020,14 +1096,6 @@ function initializeSectionFunctionality(sectionId) {
 /**
  * Initialize blockchain section with live data
  */
-function initializeBlockchainSection() {
-    const statusContainer = document.getElementById('blockchain-status');
-    const blocksContainer = document.getElementById('blockchain-blocks');
-    const certificatesContainer = document.getElementById('blockchain-certificates');
-    
-    if (statusContainer) {
-        statusContainer.innerHTML = window.blockchainSystem.renderBlockchainStatus();
-    }
     
     if (blocksContainer) {
         blocksContainer.innerHTML = window.blockchainSystem.renderRecentBlocks();

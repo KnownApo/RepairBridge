@@ -1,0 +1,68 @@
+{
+  "stats": {
+    "vehicles": 164,
+    "sources": 12,
+    "diagnostics": 5,
+    "compliance": "99.2%"
+  },
+  "recentActivity": [
+    {"text": "🔧 Volvo S60 diagnostic completed", "time": "40 min ago"},
+    {"text": "📥 Toyota data feed synced", "time": "1 hour ago"},
+    {"text": "🧾 Compliance report generated", "time": "Today"}
+  ],
+  "dataSources": [
+    {"name": "Ford Motor Company", "status": "connected", "lastSync": "8 min ago"},
+    {"name": "General Motors", "status": "connected", "lastSync": "12 min ago"},
+    {"name": "Toyota Motor Corp", "status": "connected", "lastSync": "10 min ago"},
+    {"name": "BMW Group", "status": "disconnected", "lastSync": "Connection issue"}
+  ],
+  "dataAnalytics": {
+    "quota": "82% of monthly quota",
+    "speed": "2.1s avg",
+    "connections": "3/4 active"
+  },
+  "marketplace": [
+    {
+      "name": "OBD-II Scanner Pro",
+      "desc": "Professional diagnostic scanner with live data streaming",
+      "original": 299,
+      "discount": 249
+    },
+    {
+      "name": "Leak Detection Kit",
+      "desc": "UV dye and detection system for fluid leaks",
+      "original": 89,
+      "discount": 69
+    },
+    {
+      "name": "EV Diagnostics Course",
+      "desc": "Comprehensive electric vehicle diagnostic training",
+      "original": 499,
+      "discount": 399
+    },
+    {
+      "name": "ASE Certification Prep",
+      "desc": "Complete preparation course for ASE certification",
+      "original": 199,
+      "discount": 149
+    }
+  ],
+  "inventory": {
+    "lowStock": [
+      {"part": "Brake Pads (Ceramic)", "qty": 3},
+      {"part": "Oil Filters", "qty": 4},
+      {"part": "Spark Plugs", "qty": 2}
+    ],
+    "suppliers": ["NAPA", "AutoZone Pro", "O'Reilly Wholesale"]
+  },
+  "analytics": {
+    "monthlyRevenue": "$42,800",
+    "jobsCompleted": 128,
+    "avgCycleTime": "1.8 days"
+  },
+  "compliance": {
+    "lastAudit": "2026-02-20",
+    "openFindings": 0,
+    "nextReview": "2026-03-20"
+  }
+}
