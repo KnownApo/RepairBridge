@@ -80,6 +80,10 @@ RepairBridge is a modern web application that provides independent auto repair s
 
 **Note:** older prototype pages are kept under `/prototypes`.
 
+## 📜 Policies (Draft)
+- [Privacy Policy](PRIVACY.md)
+- [Terms of Service](TERMS.md)
+
 ### File Structure
 ```
 RepairBridge/

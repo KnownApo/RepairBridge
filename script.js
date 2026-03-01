@@ -633,10 +633,20 @@ function displaySearchResults(results) {
     container.innerHTML = html;
 }
 
-async function safeFetchJson(url) {
+const _rbCache = new Map();
+
+async function safeFetchJson(url, ttlMs = 5 * 60 * 1000) {
+    const cached = _rbCache.get(url);
+    const now = Date.now();
+    if (cached && (now - cached.ts) < ttlMs) {
+        return cached.data;
+    }
+
     const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
+    const data = await res.json();
+    _rbCache.set(url, { ts: now, data });
+    return data;
 }
 
 async function fetchVinData(vin) {
@@ -654,6 +664,7 @@ async function fetchVinData(vin) {
         };
     } catch (err) {
         console.warn('VIN decode failed', err);
+        showNotification('VIN lookup failed. Please try again.', 'error');
         return { vin, make: 'Unknown', model: 'Unknown', year: 'Unknown', trim: '—', body: '—', engine: '—' };
     }
 }
@@ -667,6 +678,7 @@ async function fetchRecalls(vinData) {
         return data?.results || [];
     } catch (err) {
         console.warn('Recall fetch failed', err);
+        showNotification('Recall data unavailable.', 'warning');
         return [];
     }
 }
@@ -680,6 +692,7 @@ async function fetchComplaints(vinData) {
         return data?.results || [];
     } catch (err) {
         console.warn('Complaints fetch failed', err);
+        showNotification('Complaint data unavailable.', 'warning');
         return [];
     }
 }
@@ -693,6 +706,7 @@ async function fetchTsbs(vinData) {
         return data?.results || [];
     } catch (err) {
         console.warn('TSB fetch failed', err);
+        showNotification('TSB data unavailable.', 'warning');
         return null; // null indicates unavailable
     }
 }
