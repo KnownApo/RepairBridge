@@ -751,7 +751,8 @@ function displayVinResults(vinData, recalls, complaints, tsbs) {
                 <li>Total estimate: —</li>
             </ul>
         </div>
-        <button type="button" class="action-btn" style="margin-top:16px;" onclick="downloadVinReport()">⬇️ Download VIN Report</button>
+        <button type="button" class="action-btn" style="margin-top:16px;" onclick="downloadVinReport()">⬇️ Download VIN Report (.txt)</button>
+        <button type="button" class="action-btn" style="margin-top:10px;" onclick="downloadVinReportCSV()">⬇️ Download VIN Report (.csv)</button>
     `;
 
     window._rb_lastVinReport = { vinData, recalls, complaints, tsbs };
@@ -796,6 +797,52 @@ function downloadVinReport() {
     URL.revokeObjectURL(url);
 
     saveReportToHistory(vinData, recalls.length, complaints.length, Array.isArray(tsbs) ? tsbs.length : null);
+}
+
+function downloadVinReportCSV() {
+    const payload = window._rb_lastVinReport;
+    if (!payload) {
+        showNotification('Run a VIN search first', 'warning');
+        return;
+    }
+    const { vinData, recalls, complaints, tsbs } = payload;
+
+    const rows = [];
+    rows.push(['Type','Component','Summary']);
+
+    recalls.forEach(r => rows.push(['Recall', r.Component || 'Recall', r.Summary || 'Details available']));
+    complaints.forEach(c => rows.push(['Complaint', c.Component || 'Complaint', c.Summary || 'Details available']));
+    if (Array.isArray(tsbs)) {
+        tsbs.forEach(t => rows.push(['TSB', t.Component || 'TSB', t.Summary || 'Details available']));
+    } else {
+        rows.push(['TSB','Unavailable','No free public endpoint']);
+    }
+
+    const meta = [
+        ['VIN', vinData.vin],
+        ['Vehicle', `${vinData.year} ${vinData.make} ${vinData.model} (${vinData.trim})`],
+        ['Body', vinData.body],
+        ['Engine', vinData.engine]
+    ];
+
+    const lines = [];
+    meta.forEach(([k,v]) => lines.push(`${csvEscape(k)},${csvEscape(v)}`));
+    lines.push('');
+    rows.forEach(row => lines.push(row.map(csvEscape).join(',')));
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `vin-report-${vinData.vin}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function csvEscape(value) {
+    if (value === null || value === undefined) return '';
+    const s = String(value).replace(/"/g, '""');
+    return /[",\n]/.test(s) ? `"${s}"` : s;
 }
 
 function saveSearchHistory(vinData, recallCount, complaintCount, tsbCount) {
@@ -862,6 +909,7 @@ function clearSearchHistory() {
 
 // expose for inline onclick
 window.downloadVinReport = downloadVinReport;
+window.downloadVinReportCSV = downloadVinReportCSV;
 window.clearSearchHistory = clearSearchHistory;
 
 /**
