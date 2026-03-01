@@ -294,7 +294,8 @@ function buildMakesUrl(base) {
     const url = new URL(base);
     url.searchParams.set("format", "json");
     return url.toString();
-  } catch (err) {
+  } catch (error) {
+    console.warn("Failed to build NHTSA endpoint", error);
     const joiner = String(base).includes("?") ? "&" : "?";
     return `${base}${joiner}format=json`;
   }
@@ -309,8 +310,11 @@ function buildVehicleQueryUrl(endpointName, vinData) {
     url.searchParams.set("model", model);
     url.searchParams.set("modelYear", year);
     return url.toString();
-  } catch (err) {
-    const params = `make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&modelYear=${encodeURIComponent(year)}`;
+  } catch (error) {
+    console.warn("Failed to build repair estimate endpoint", error);
+    const params = `make=${encodeURIComponent(make)}&model=${encodeURIComponent(
+      model
+    )}&modelYear=${encodeURIComponent(year)}`;
     const joiner = String(base).includes("?") ? "&" : "?";
     return `${base}${joiner}${params}`;
   }

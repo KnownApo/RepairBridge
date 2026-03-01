@@ -9,9 +9,7 @@ const copyRecursive = async (src, dest) => {
   if (info.isDirectory()) {
     await mkdir(dest, { recursive: true });
     const entries = await readdir(src);
-    await Promise.all(
-      entries.map((entry) => copyRecursive(join(src, entry), join(dest, entry)))
-    );
+    await Promise.all(entries.map((entry) => copyRecursive(join(src, entry), join(dest, entry))));
     return;
   }
 
@@ -40,7 +38,7 @@ const main = async () => {
     "modules",
     "data",
     "PRIVACY.md",
-    "TERMS.md"
+    "TERMS.md",
   ];
 
   await Promise.all(

@@ -400,7 +400,8 @@ async function loadLaborEstimatePanel(vinData) {
       if (typeof value === "string") return value;
       try {
         return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(value);
-      } catch (err) {
+      } catch (error) {
+        console.warn("Currency formatting failed", error);
         return `$${value}`;
       }
     };
@@ -617,6 +618,8 @@ function searchVehicle() {
 }
 
 // expose for inline onclick
+window.initializeSearch = initializeSearch;
+window.loadSearchHistory = loadSearchHistory;
 window.searchVehicle = searchVehicle;
 window.clearSearchHistory = clearSearchHistory;
 window.saveTsbFallback = saveTsbFallback;

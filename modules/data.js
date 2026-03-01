@@ -42,9 +42,12 @@ async function loadAppData() {
       ttlMs: 10 * 60 * 1000,
       cacheKey: "repairbridge:data",
     });
-    const { compliance, ...baseData } = rawData || {};
+    const baseData = { ...(rawData || {}) };
     if (baseData.stats && baseData.stats.compliance) {
       delete baseData.stats.compliance;
+    }
+    if (baseData.compliance) {
+      delete baseData.compliance;
     }
     const existing = getAppData() || {};
     const mergedAccount = {
@@ -423,4 +426,12 @@ function loadARDiagnostics() {
 function loadComplianceContent() {
   loadComplianceData({ refresh: true });
   hydrateCompliance();
+}
+
+if (typeof window !== "undefined") {
+  window.loadAppData = loadAppData;
+  window.loadDashboardData = loadDashboardData;
+  window.loadDataAggregatorContent = loadDataAggregatorContent;
+  window.loadARDiagnostics = loadARDiagnostics;
+  window.loadComplianceContent = loadComplianceContent;
 }

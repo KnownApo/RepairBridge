@@ -3,13 +3,9 @@
  * Loads UI + data + search modules
  */
 
-// Global state
-let cartItems = 0;
-let isARActive = false;
-
 // Initialize the application when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    initializeApp().catch(err => console.error('Initialization failed', err));
+document.addEventListener("DOMContentLoaded", () => {
+  initializeApp().catch((err) => console.error("Initialization failed", err));
 });
 
 /**
@@ -17,47 +13,47 @@ document.addEventListener('DOMContentLoaded', () => {
  * Sets up event listeners and initializes components
  */
 async function initializeApp() {
-    console.log('RepairBridge Platform initializing...');
+  console.log("RepairBridge Platform initializing...");
 
-    if (window.RepairBridgeAuth?.initializeAuth) {
-        await window.RepairBridgeAuth.initializeAuth();
-    }
+  if (window.RepairBridgeAuth?.initializeAuth) {
+    await window.RepairBridgeAuth.initializeAuth();
+  }
 
-    // Initialize navigation system
-    initializeNavigation();
+  // Initialize navigation system
+  window.initializeNavigation?.();
 
-    // Initialize interactive components
-    initializeInteractiveComponents();
+  // Initialize interactive components
+  window.initializeInteractiveComponents?.();
 
-    // Initialize data refresh mechanisms
-    initializeDataRefresh();
+  // Initialize data refresh mechanisms
+  window.initializeDataRefresh?.();
 
-    // Initialize search functionality
-    initializeSearch();
+  // Initialize search functionality
+  window.initializeSearch?.();
 
-    // Load saved report history
-    loadSavedReports();
+  // Load saved report history
+  window.loadSavedReports?.();
 
-    // Initialize AR controls
-    initializeARControls();
+  // Initialize AR controls
+  window.initializeARControls?.();
 
-    // Initialize marketplace functionality
-    initializeMarketplace();
+  // Initialize marketplace functionality
+  window.initializeMarketplace?.();
 
-    // Initialize compliance tools
-    initializeCompliance();
+  // Initialize compliance tools
+  window.initializeCompliance?.();
 
-    // Initialize competitive features
-    initializeCompetitiveFeatures();
+  // Initialize competitive features
+  window.initializeCompetitiveFeatures?.();
 
-    // Setup voice commands context tracking
-    setupVoiceContextTracking();
+  // Setup voice commands context tracking
+  window.setupVoiceContextTracking?.();
 
-    // Show welcome message
-    showWelcomeMessage();
+  // Show welcome message
+  window.showWelcomeMessage?.();
 
-    // Load demo data and hydrate UI
-    loadAppData();
+  // Load demo data and hydrate UI
+  window.loadAppData?.();
 
-    console.log('RepairBridge Platform initialized successfully!');
+  console.log("RepairBridge Platform initialized successfully!");
 }

@@ -6,81 +6,90 @@
 const RepairBridgeServices = window.RepairBridgeServices || {};
 
 function initializeNavigation() {
-    return RepairBridgeServices.navigation?.initializeNavigation();
+  return RepairBridgeServices.navigation?.initializeNavigation();
 }
 
 function initializeInteractiveComponents() {
-    return RepairBridgeServices.interaction?.initializeInteractiveComponents();
+  return RepairBridgeServices.interaction?.initializeInteractiveComponents();
 }
 
 function initializeDataRefresh() {
-    return RepairBridgeServices.dataRefresh?.initializeDataRefresh();
+  return RepairBridgeServices.dataRefresh?.initializeDataRefresh();
 }
 
 function initializeARControls() {
-    return RepairBridgeServices.ar?.initializeARControls();
+  return RepairBridgeServices.ar?.initializeARControls();
 }
 
 function initializeMarketplace() {
-    return RepairBridgeServices.marketplace?.initializeMarketplace();
+  return RepairBridgeServices.marketplace?.initializeMarketplace();
 }
 
 function initializeCompliance() {
-    return RepairBridgeServices.compliance?.initializeCompliance();
+  return RepairBridgeServices.compliance?.initializeCompliance();
 }
 
 function initializeCompetitiveFeatures() {
-    return RepairBridgeServices.competitive?.initializeCompetitiveFeatures();
+  return RepairBridgeServices.competitive?.initializeCompetitiveFeatures();
 }
 
 function setupVoiceContextTracking() {
-    return RepairBridgeServices.voice?.setupVoiceContextTracking();
+  return RepairBridgeServices.voice?.setupVoiceContextTracking();
 }
 
 function showWelcomeMessage() {
-    return RepairBridgeServices.navigation?.showWelcomeMessage();
+  return RepairBridgeServices.navigation?.showWelcomeMessage();
 }
 
 function showSection(sectionId) {
-    return RepairBridgeServices.section?.showSection(sectionId);
+  return RepairBridgeServices.section?.showSection(sectionId);
 }
 
 function quickAction(action) {
-    return RepairBridgeServices.legacyActions?.quickAction(action);
+  return RepairBridgeServices.legacyActions?.quickAction(action);
 }
 
 function updateLiveData() {
-    return RepairBridgeServices.legacyActions?.updateLiveData();
+  return RepairBridgeServices.legacyActions?.updateLiveData();
 }
 
 function refreshData() {
-    return RepairBridgeServices.legacyActions?.refreshData();
+  return RepairBridgeServices.legacyActions?.refreshData();
 }
 
 function toggleAR() {
-    return RepairBridgeServices.ar?.toggleAR();
+  return RepairBridgeServices.ar?.toggleAR();
 }
 
 function startARSession() {
-    return RepairBridgeServices.ar?.startARSession();
+  return RepairBridgeServices.ar?.startARSession();
 }
 
 function stopARSession() {
-    return RepairBridgeServices.ar?.stopARSession();
+  return RepairBridgeServices.ar?.stopARSession();
 }
 
 function updateDataSources() {
-    return RepairBridgeServices.dataRefresh?.updateDataSources();
+  return RepairBridgeServices.dataRefresh?.updateDataSources();
 }
 
 function handleQuickAction(action) {
-    return RepairBridgeServices.interaction?.handleQuickAction(action);
+  return RepairBridgeServices.interaction?.handleQuickAction(action);
 }
 
 function showNotification(message, type) {
-    return RepairBridgeServices.notification?.showNotification(message, type);
+  return RepairBridgeServices.notification?.showNotification(message, type);
 }
 
+window.initializeNavigation = initializeNavigation;
+window.initializeInteractiveComponents = initializeInteractiveComponents;
+window.initializeDataRefresh = initializeDataRefresh;
+window.initializeARControls = initializeARControls;
+window.initializeMarketplace = initializeMarketplace;
+window.initializeCompliance = initializeCompliance;
+window.initializeCompetitiveFeatures = initializeCompetitiveFeatures;
+window.setupVoiceContextTracking = setupVoiceContextTracking;
+window.showWelcomeMessage = showWelcomeMessage;
 window.showSection = showSection;
 window.startARSession = startARSession;
 window.stopARSession = stopARSession;
@@ -88,3 +97,6 @@ window.quickAction = quickAction;
 window.updateLiveData = updateLiveData;
 window.refreshData = refreshData;
 window.toggleAR = toggleAR;
+window.updateDataSources = updateDataSources;
+window.handleQuickAction = handleQuickAction;
+window.showNotification = showNotification;

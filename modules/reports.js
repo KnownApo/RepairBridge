@@ -571,6 +571,8 @@ if (typeof window !== "undefined") {
   window.downloadVinReport = downloadVinReport;
   window.downloadVinReportCSV = downloadVinReportCSV;
   window.downloadVinReportPDF = downloadVinReportPDF;
+  window.exportTransactionLog = exportTransactionLog;
+  window.generateComplianceReport = generateComplianceReport;
 }
 
 if (typeof module !== "undefined") {
