@@ -94,6 +94,48 @@ npm run dev
 - Example endpoints: `/api/v1/users`, `/api/v1/shops`, `/api/v1/vin-lookups`, `/api/v1/reports`
 - Configure `PORT` or `CORS_ORIGIN` via `.env` (see `.env.example`).
 
+### Minimal DB Schema (MVP)
+
+```sql
+-- users
+CREATE TABLE users (
+  id TEXT PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  display_name TEXT,
+  role TEXT DEFAULT 'owner',
+  shop_id TEXT,
+  created_at TEXT NOT NULL
+);
+
+-- shops
+CREATE TABLE shops (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  timezone TEXT,
+  address TEXT,
+  created_at TEXT NOT NULL
+);
+
+-- vin lookups
+CREATE TABLE vin_lookups (
+  id TEXT PRIMARY KEY,
+  vin TEXT NOT NULL,
+  user_id TEXT,
+  shop_id TEXT,
+  summary TEXT,
+  created_at TEXT NOT NULL
+);
+
+-- reports
+CREATE TABLE reports (
+  id TEXT PRIMARY KEY,
+  vin_lookup_id TEXT,
+  report_type TEXT NOT NULL,
+  payload TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+```
+
 ## 📜 Policies (Draft)
 - [Privacy Policy](PRIVACY.md)
 - [Terms of Service](TERMS.md)
@@ -246,7 +288,6 @@ The earlier competitive feature prototypes (telematics, blockchain verification,
 
 ## 🐛 Known Issues
 
-- AR functionality is currently simulated (requires camera API integration)
 - Marketplace cart persists across sessions (localStorage)
 - Make/model search results use NHTSA vPIC live data (VIN searches use NHTSA APIs)
 
