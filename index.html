@@ -152,7 +152,9 @@
             <div class="widget">
                 <h3>Vehicle Data Search</h3>
                 <div class="search-form">
+                    <label class="sr-only" for="vehicle-search">Vehicle VIN</label>
                     <input type="text" placeholder="Enter VIN (license plates not supported yet)" class="search-input" id="vehicle-search">
+                    <label class="sr-only" for="make-filter">Filter by make</label>
                     <select class="search-select" id="make-filter">
                         <option>All Makes</option>
                         <option>Ford</option>
@@ -164,13 +166,58 @@
                         🔍 Search
                     </button>
                 </div>
-                <div id="search-results" style="margin-top: 20px;"></div>
-                <div class="widget" style="margin-top:16px;">
-                    <h4 style="color:#fff;margin-bottom:8px;">Recent VIN Searches</h4>
+                <div id="search-results" class="search-results"></div>
+                <div class="widget widget-spaced">
+                    <h4 class="widget-subtitle">Recent VIN Searches</h4>
                     <div id="search-history" class="activity-list"></div>
-                    <button type="button" class="action-btn" style="margin-top:10px;" onclick="clearSearchHistory()">🧹 Clear History</button>
-                    <p style="color:#cbd5e1; font-size: 12px; margin-top:10px;">Data is provided for informational purposes only. Verify before making repair decisions.</p>
+                    <button type="button" class="action-btn btn-spaced" onclick="clearSearchHistory()">🧹 Clear History</button>
+                    <p class="widget-note">Data is provided for informational purposes only. Verify before making repair decisions.</p>
                 </div>
+                <div class="widget widget-spaced">
+                    <h4 class="widget-subtitle">Saved VIN Reports</h4>
+                    <div id="saved-reports" class="activity-list"></div>
+                    <button type="button" class="action-btn btn-spaced" onclick="clearSavedReports()">🗑️ Clear Saved Reports</button>
+                    <p class="widget-note">Saved reports live in this browser only.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Report View Section -->
+        <section id="report-view" class="content-section">
+            <div class="section-header report-view-header">
+                <h2 id="report-view-title">🧾 VIN Report</h2>
+                <p id="report-view-subtitle">Saved report details</p>
+                <div class="report-view-actions">
+                    <button type="button" class="action-btn" onclick="showSection('data-aggregator')">← Back to Data Hub</button>
+                    <button type="button" class="action-btn" onclick="rerunViewedReport()">🔁 Re-run</button>
+                </div>
+            </div>
+
+            <div class="report-view-grid">
+                <div class="widget">
+                    <h3>Vehicle Info</h3>
+                    <div id="report-view-meta" class="report-meta"></div>
+                </div>
+
+                <div class="widget">
+                    <h3>Recalls</h3>
+                    <ul id="report-view-recalls" class="report-list"></ul>
+                </div>
+
+                <div class="widget">
+                    <h3>Complaints</h3>
+                    <ul id="report-view-complaints" class="report-list"></ul>
+                </div>
+
+                <div class="widget">
+                    <h3>TSBs</h3>
+                    <ul id="report-view-tsbs" class="report-list"></ul>
+                </div>
+            </div>
+
+            <div class="widget widget-spaced">
+                <h3>Notes</h3>
+                <p id="report-view-notes" class="widget-note"></p>
             </div>
         </section>
 
@@ -374,11 +421,13 @@
         ©2025 RepairBridge
     </div>
 
-    <script src="modules/notification-manager.js"></script>
-    <script src="modules/analytics.js"></script>
-    <script src="modules/marketplace.js"></script>
-    <script src="modules/inventory-manager.js"></script>
-    <script src="modules/settings-manager.js"></script>
+    <script src="modules/config.js"></script>
+    <script src="modules/api.js"></script>
+    <script src="modules/data.js"></script>
+    <script src="modules/ui.js"></script>
+    <script src="modules/labor-estimates.js"></script>
+    <script src="modules/search.js"></script>
+    <script src="modules/reports.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

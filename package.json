@@ -5,6 +5,18 @@
   "description": "RepairBridge UI demo",
   "scripts": {
     "dev": "npx --yes http-server . -p 8080 -c-1",
-    "serve": "npx --yes http-server . -p 8080 -c-1"
+    "serve": "npx --yes http-server . -p 8080 -c-1",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --check .",
+    "format:write": "prettier --write .",
+    "build": "node scripts/build.mjs",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "prettier": "^3.2.5"
   }
 }
