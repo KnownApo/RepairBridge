@@ -179,7 +179,7 @@ app.post("/api/v1/compliance/reports", (req, res) => {
     .json({ data: { id, status: "generated", summary: summary || "Compliance report generated" } });
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   console.error(err);
   res.status(500).json({ error: "internal server error" });
 });
