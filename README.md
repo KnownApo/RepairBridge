@@ -86,9 +86,9 @@ RepairBridge is a modern web application that provides independent auto repair s
 
 **Note:** older prototype pages are kept under `/prototypes`.
 
-### Backend (API skeleton)
+### Backend (API)
 
-A lightweight Express + SQLite backend lives in `backend/` for future integration.
+A lightweight Express + SQLite backend lives in `backend/` and now powers labor estimates and cached NHTSA lookups.
 
 ```bash
 cd backend
@@ -97,7 +97,13 @@ npm run dev
 ```
 
 - Health check: `GET http://localhost:5050/health`
-- Example endpoints: `/api/v1/users`, `/api/v1/shops`, `/api/v1/vin-lookups`, `/api/v1/reports`
+- Core endpoints: `/api/v1/users`, `/api/v1/shops`, `/api/v1/vin-lookups`, `/api/v1/reports`
+- Labor engine: `POST /api/v1/labor-estimates`
+- Cached NHTSA proxy:
+  - `GET /api/v1/nhtsa/vin/:vin`
+  - `GET /api/v1/nhtsa/recalls?make=&model=&modelYear=`
+  - `GET /api/v1/nhtsa/complaints?make=&model=&modelYear=`
+  - `GET /api/v1/nhtsa/tsbs?make=&model=&modelYear=`
 - Configure `PORT` or `CORS_ORIGIN` via `.env` (see `.env.example`).
 
 ### Minimal DB Schema (MVP)
@@ -230,13 +236,16 @@ RepairBridge/
 ### API Endpoints
 
 - VIN/recall/complaint/TSB endpoints are configurable via `modules/config.js`
+- Defaults now point to the **backend cache** (with automatic fallback to public NHTSA if the backend is down)
 - Override endpoints in the browser console with:
   ```js
   RepairBridgeConfig.setEndpoints({
-    vinDecodeBase: "https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvaluesextended",
-    recallsBase: "https://api.nhtsa.gov/recalls/recallsByVehicle",
-    complaintsBase: "https://api.nhtsa.gov/complaints/complaintsByVehicle",
-    tsbsBase: "https://api.nhtsa.gov/tsbs/tsbsByVehicle",
+    backendBase: "http://localhost:5050",
+    vinDecodeBase: "http://localhost:5050/api/v1/nhtsa/vin",
+    recallsBase: "http://localhost:5050/api/v1/nhtsa/recalls",
+    complaintsBase: "http://localhost:5050/api/v1/nhtsa/complaints",
+    tsbsBase: "http://localhost:5050/api/v1/nhtsa/tsbs",
+    laborEstimatesBase: "http://localhost:5050/api/v1/labor-estimates",
   });
   ```
 - Reset to defaults with `RepairBridgeConfig.resetEndpoints()`

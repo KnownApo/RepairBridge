@@ -144,6 +144,19 @@ function storeApiCache(cacheKey, payload) {
   );
 }
 
+function pruneCache() {
+  try {
+    db.prepare("DELETE FROM api_cache WHERE created_at < datetime('now', ?)").run(
+      `-${Math.ceil(API_CACHE_TTL_MS / 60000)} minutes`
+    );
+    db.prepare("DELETE FROM labor_estimates WHERE created_at < datetime('now', ?)").run(
+      `-${Math.ceil(LABOR_CACHE_TTL_MS / 60000)} minutes`
+    );
+  } catch (err) {
+    console.warn("Cache prune failed", err);
+  }
+}
+
 async function fetchWithCache({ cacheKey, url, ttlMs = API_CACHE_TTL_MS }) {
   const cached = getCachedApiResponse(cacheKey);
   if (cached) {
@@ -393,4 +406,6 @@ app.use((err, req, res) => {
 
 app.listen(port, () => {
   console.log(`RepairBridge backend listening on http://localhost:${port}`);
+  pruneCache();
+  setInterval(pruneCache, 12 * 60 * 60 * 1000);
 });
