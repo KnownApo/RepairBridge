@@ -70,6 +70,13 @@ db.exec(`
     payload_json TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS api_cache (
+    id TEXT PRIMARY KEY,
+    cache_key TEXT NOT NULL,
+    payload_json TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
 `);
 
 export default db;

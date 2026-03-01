@@ -100,10 +100,21 @@ RepairBridgeDataAdapters.registerAdapter({
   },
   decodeVin: async (vin) => {
     const base = RepairBridgeConfig.getEndpoint("vinDecodeBase");
+    const fallbackBase = "https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvaluesextended";
     const sanitized = String(vin).replace(/^\/+|\/+$/g, "");
     const cleanedBase = String(base || "").replace(/\/+$/g, "");
+    const cleanedFallback = String(fallbackBase).replace(/\/+$/g, "");
     const url = `${cleanedBase}/${encodeURIComponent(sanitized)}?format=json`;
-    const data = await RepairBridgeAPI.getJson(url);
+    const fallbackUrl = `${cleanedFallback}/${encodeURIComponent(sanitized)}?format=json`;
+
+    let data;
+    try {
+      data = await RepairBridgeAPI.getJson(url);
+    } catch (err) {
+      console.warn("VIN decode via backend failed, falling back", err);
+      data = await RepairBridgeAPI.getJson(fallbackUrl);
+    }
+
     const row = data?.Results?.[0] || {};
     return {
       vin,
@@ -118,20 +129,56 @@ RepairBridgeDataAdapters.registerAdapter({
   getRecalls: async (vinData) => {
     if (!vinData || vinData.make === "Unknown") return [];
     const url = buildVehicleQueryUrl("recallsBase", vinData);
-    const data = await RepairBridgeAPI.getJson(url);
-    return data?.results || [];
+    const fallbackUrl = buildVehicleQueryUrl(
+      "recallsFallbackBase",
+      vinData,
+      "https://api.nhtsa.gov/recalls/recallsByVehicle"
+    );
+
+    try {
+      const data = await RepairBridgeAPI.getJson(url);
+      return data?.results || [];
+    } catch (err) {
+      console.warn("Recalls via backend failed, falling back", err);
+      const data = await RepairBridgeAPI.getJson(fallbackUrl);
+      return data?.results || [];
+    }
   },
   getComplaints: async (vinData) => {
     if (!vinData || vinData.make === "Unknown") return [];
     const url = buildVehicleQueryUrl("complaintsBase", vinData);
-    const data = await RepairBridgeAPI.getJson(url);
-    return data?.results || [];
+    const fallbackUrl = buildVehicleQueryUrl(
+      "complaintsFallbackBase",
+      vinData,
+      "https://api.nhtsa.gov/complaints/complaintsByVehicle"
+    );
+
+    try {
+      const data = await RepairBridgeAPI.getJson(url);
+      return data?.results || [];
+    } catch (err) {
+      console.warn("Complaints via backend failed, falling back", err);
+      const data = await RepairBridgeAPI.getJson(fallbackUrl);
+      return data?.results || [];
+    }
   },
   getTsbs: async (vinData) => {
     if (!vinData || vinData.make === "Unknown") return null;
     const url = buildVehicleQueryUrl("tsbsBase", vinData);
-    const data = await RepairBridgeAPI.getJson(url);
-    return data?.results || [];
+    const fallbackUrl = buildVehicleQueryUrl(
+      "tsbsFallbackBase",
+      vinData,
+      "https://api.nhtsa.gov/tsbs/tsbsByVehicle"
+    );
+
+    try {
+      const data = await RepairBridgeAPI.getJson(url);
+      return data?.results || [];
+    } catch (err) {
+      console.warn("TSBs via backend failed, falling back", err);
+      const data = await RepairBridgeAPI.getJson(fallbackUrl);
+      return data?.results || [];
+    }
   },
   getMakes: async ({ query } = {}) => {
     const base = RepairBridgeConfig.getEndpoint("makesBase");
@@ -301,8 +348,8 @@ function buildMakesUrl(base) {
   }
 }
 
-function buildVehicleQueryUrl(endpointName, vinData) {
-  const base = RepairBridgeConfig.getEndpoint(endpointName);
+function buildVehicleQueryUrl(endpointName, vinData, fallbackBase = "") {
+  const base = RepairBridgeConfig.getEndpoint(endpointName) || fallbackBase;
   const { make, model, year } = vinData || {};
   try {
     const url = new URL(base);
@@ -311,7 +358,7 @@ function buildVehicleQueryUrl(endpointName, vinData) {
     url.searchParams.set("modelYear", year);
     return url.toString();
   } catch (error) {
-    console.warn("Failed to build repair estimate endpoint", error);
+    console.warn("Failed to build vehicle query endpoint", error);
     const params = `make=${encodeURIComponent(make)}&model=${encodeURIComponent(
       model
     )}&modelYear=${encodeURIComponent(year)}`;

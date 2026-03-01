@@ -16,6 +16,7 @@ const DEFAULT_COMPLIANCE = {
 };
 
 const LABOR_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+const API_CACHE_TTL_MS = 15 * 60 * 1000;
 
 function getComplianceStatus() {
   const row = db
@@ -115,6 +116,47 @@ function storeLaborEstimate(cacheKey, payload, { vin, procedure, region } = {}) 
   db.prepare(
     "INSERT INTO labor_estimates (id, cache_key, vin, procedure, region, payload_json) VALUES (?, ?, ?, ?, ?, ?)"
   ).run(id, cacheKey, vin || null, procedure || null, region || null, JSON.stringify(payload));
+}
+
+function getCachedApiResponse(cacheKey) {
+  const row = db
+    .prepare(
+      "SELECT payload_json, created_at FROM api_cache WHERE cache_key = ? ORDER BY created_at DESC LIMIT 1"
+    )
+    .get(cacheKey);
+  if (!row?.payload_json) return null;
+  const createdAt = new Date(row.created_at).getTime();
+  if (!createdAt || Date.now() - createdAt > API_CACHE_TTL_MS) return null;
+  try {
+    return JSON.parse(row.payload_json);
+  } catch (err) {
+    console.warn("Failed to parse cached API response", err);
+    return null;
+  }
+}
+
+function storeApiCache(cacheKey, payload) {
+  const id = crypto.randomUUID();
+  db.prepare("INSERT INTO api_cache (id, cache_key, payload_json) VALUES (?, ?, ?)").run(
+    id,
+    cacheKey,
+    JSON.stringify(payload)
+  );
+}
+
+async function fetchWithCache({ cacheKey, url, ttlMs = API_CACHE_TTL_MS }) {
+  const cached = getCachedApiResponse(cacheKey);
+  if (cached) {
+    return { data: cached, cached: true };
+  }
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+  const data = await response.json();
+  storeApiCache(cacheKey, data);
+  return { data, cached: false };
 }
 
 app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
@@ -231,6 +273,81 @@ app.post("/api/v1/labor-estimates", (req, res) => {
   const payload = buildLaborEstimate({ vinData, procedure, region, laborRate, mileage });
   storeLaborEstimate(cacheKey, payload, { vin, procedure, region });
   res.json({ data: payload, cached: false });
+});
+
+app.get("/api/v1/nhtsa/vin/:vin", async (req, res) => {
+  const vin = String(req.params.vin || "").trim();
+  if (!vin) return res.status(400).json({ error: "vin is required" });
+  const url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvaluesextended/${encodeURIComponent(
+    vin
+  )}?format=json`;
+  try {
+    const { data, cached } = await fetchWithCache({
+      cacheKey: `vin:${vin}`,
+      url,
+    });
+    res.json({ ...data, cached });
+  } catch (err) {
+    console.warn("VIN decode failed", err);
+    res.status(502).json({ error: "vin decode failed" });
+  }
+});
+
+app.get("/api/v1/nhtsa/recalls", async (req, res) => {
+  const { make, model, modelYear } = req.query;
+  if (!make || !model || !modelYear) {
+    return res.status(400).json({ error: "make, model, modelYear required" });
+  }
+  const params = new URLSearchParams({ make, model, modelYear }).toString();
+  const url = `https://api.nhtsa.gov/recalls/recallsByVehicle?${params}`;
+  try {
+    const { data, cached } = await fetchWithCache({
+      cacheKey: `recalls:${make}:${model}:${modelYear}`,
+      url,
+    });
+    res.json({ ...data, cached });
+  } catch (err) {
+    console.warn("Recalls fetch failed", err);
+    res.status(502).json({ error: "recalls fetch failed" });
+  }
+});
+
+app.get("/api/v1/nhtsa/complaints", async (req, res) => {
+  const { make, model, modelYear } = req.query;
+  if (!make || !model || !modelYear) {
+    return res.status(400).json({ error: "make, model, modelYear required" });
+  }
+  const params = new URLSearchParams({ make, model, modelYear }).toString();
+  const url = `https://api.nhtsa.gov/complaints/complaintsByVehicle?${params}`;
+  try {
+    const { data, cached } = await fetchWithCache({
+      cacheKey: `complaints:${make}:${model}:${modelYear}`,
+      url,
+    });
+    res.json({ ...data, cached });
+  } catch (err) {
+    console.warn("Complaints fetch failed", err);
+    res.status(502).json({ error: "complaints fetch failed" });
+  }
+});
+
+app.get("/api/v1/nhtsa/tsbs", async (req, res) => {
+  const { make, model, modelYear } = req.query;
+  if (!make || !model || !modelYear) {
+    return res.status(400).json({ error: "make, model, modelYear required" });
+  }
+  const params = new URLSearchParams({ make, model, modelYear }).toString();
+  const url = `https://api.nhtsa.gov/tsbs/tsbsByVehicle?${params}`;
+  try {
+    const { data, cached } = await fetchWithCache({
+      cacheKey: `tsbs:${make}:${model}:${modelYear}`,
+      url,
+    });
+    res.json({ ...data, cached });
+  } catch (err) {
+    console.warn("TSB fetch failed", err);
+    res.status(502).json({ error: "tsb fetch failed" });
+  }
 });
 
 app.get("/api/v1/compliance", (req, res) => {

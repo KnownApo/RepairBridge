@@ -6,10 +6,10 @@
 const RepairBridgeConfig = (() => {
   const defaultEndpoints = {
     backendBase: "http://localhost:5050",
-    vinDecodeBase: "https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvaluesextended",
-    recallsBase: "https://api.nhtsa.gov/recalls/recallsByVehicle",
-    complaintsBase: "https://api.nhtsa.gov/complaints/complaintsByVehicle",
-    tsbsBase: "https://api.nhtsa.gov/tsbs/tsbsByVehicle",
+    vinDecodeBase: "http://localhost:5050/api/v1/nhtsa/vin",
+    recallsBase: "http://localhost:5050/api/v1/nhtsa/recalls",
+    complaintsBase: "http://localhost:5050/api/v1/nhtsa/complaints",
+    tsbsBase: "http://localhost:5050/api/v1/nhtsa/tsbs",
     makesBase: "https://vpic.nhtsa.dot.gov/api/vehicles/getallmakes",
     modelsForMakeBase: "https://vpic.nhtsa.dot.gov/api/vehicles/getmodelsformake",
     laborEstimatesBase: "http://localhost:5050/api/v1/labor-estimates",
