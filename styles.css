@@ -138,6 +138,56 @@ body {
   color: #4facfe;
 }
 
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #e5f2ff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.status-pill .status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #94a3b8;
+}
+
+.status-pill--up {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: rgba(34, 197, 94, 0.6);
+  color: #dcfce7;
+}
+
+.status-pill--up .status-dot {
+  background: #22c55e;
+}
+
+.status-pill--down {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.6);
+  color: #fee2e2;
+}
+
+.status-pill--down .status-dot {
+  background: #ef4444;
+}
+
+.status-pill--unknown {
+  background: rgba(148, 163, 184, 0.2);
+  border-color: rgba(148, 163, 184, 0.6);
+  color: #e2e8f0;
+}
+
+.status-pill--unknown .status-dot {
+  background: #94a3b8;
+}
+
 .nav-links {
   display: flex;
   gap: 8px;
@@ -180,6 +230,97 @@ body {
   display: block !important;
 }
 
+/* Skeleton loaders */
+.loading-placeholder {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  min-height: 120px;
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-placeholder#ar-viewport {
+  min-height: 240px;
+}
+
+.loading-placeholder#inventory-panel,
+.loading-placeholder#analytics-panel,
+.loading-placeholder#compliance-panel {
+  min-height: 160px;
+}
+
+.loading-placeholder#account-panel,
+.loading-placeholder#billing-panel,
+.loading-placeholder#data-analytics-metrics {
+  min-height: 120px;
+}
+
+.skeleton-line,
+.skeleton-block {
+  position: relative;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+.skeleton-line {
+  height: 12px;
+  border-radius: 999px;
+  width: 100%;
+}
+
+.skeleton-line.short {
+  width: 55%;
+}
+
+.skeleton-line.medium {
+  width: 72%;
+}
+
+.skeleton-line.long {
+  width: 88%;
+}
+
+.skeleton-line.skeleton-title {
+  height: 16px;
+  width: 60%;
+}
+
+.skeleton-block {
+  height: 120px;
+  border-radius: 14px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Debug styles - temporary */
 .content-section#dashboard {
   display: block !important;
@@ -213,8 +354,15 @@ body {
   gap: 12px;
 }
 
-.section-header h2 i {
+.section-icon {
+  width: 24px;
+  height: 24px;
   color: #4facfe;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .section-header p {
@@ -241,9 +389,47 @@ body {
   transition: all 0.3s ease;
 }
 
-.stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+.stat-card,
+.widget,
+.cache-status-card,
+.source-card,
+.ar-panel,
+.diagnostic-history,
+.diagnostic-item,
+.cart-panel,
+.compliance-card,
+.subscription-panel {
+  transition: transform 0.25s ease, box-shadow 0.25s ease,
+    border-color 0.25s ease, background-color 0.25s ease;
+  will-change: transform, box-shadow;
+}
+
+.stat-card:hover,
+.widget:hover,
+.cache-status-card:hover,
+.source-card:hover,
+.ar-panel:hover,
+.diagnostic-history:hover,
+.diagnostic-item:hover,
+.cart-panel:hover,
+.compliance-card:hover,
+.subscription-panel:hover,
+.stat-card:focus-within,
+.widget:focus-within,
+.cache-status-card:focus-within,
+.source-card:focus-within,
+.ar-panel:focus-within,
+.diagnostic-history:focus-within,
+.diagnostic-item:focus-within,
+.cart-panel:focus-within,
+.compliance-card:focus-within,
+.subscription-panel:focus-within {
+  transform: translateY(-3px);
+  border-color: rgba(79, 172, 254, 0.35);
+  box-shadow:
+    0 14px 34px rgba(15, 23, 42, 0.18),
+    0 0 0 1px rgba(79, 172, 254, 0.2),
+    0 0 24px rgba(79, 172, 254, 0.18);
 }
 
 .stat-icon {
@@ -1491,4 +1677,102 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* Guided tour overlay */
+.rb-tour-lock {
+  overflow: hidden;
+}
+
+.rb-tour-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 12, 20, 0.72);
+  z-index: 2000;
+  display: none;
+}
+
+.rb-tour-overlay.active {
+  display: block;
+}
+
+.rb-tour-spotlight {
+  position: absolute;
+  border-radius: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 0 0 9999px rgba(10, 12, 20, 0.72),
+    0 0 30px rgba(56, 189, 248, 0.5);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.rb-tour-tooltip {
+  position: absolute;
+  max-width: 320px;
+  padding: 18px;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.96);
+  color: #f8fafc;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.rb-tour-tooltip.intro {
+  max-width: 360px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.rb-tour-tooltip h4 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.rb-tour-tooltip p {
+  font-size: 0.95rem;
+  color: rgba(226, 232, 240, 0.9);
+  margin-bottom: 16px;
+}
+
+.rb-tour-step {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(148, 163, 184, 0.9);
+  margin-bottom: 8px;
+}
+
+.rb-tour-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.rb-tour-btn {
+  border: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rb-tour-btn.primary {
+  background: linear-gradient(135deg, #38bdf8, #6366f1);
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.rb-tour-btn.ghost {
+  background: rgba(148, 163, 184, 0.15);
+  color: #e2e8f0;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.rb-tour-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }

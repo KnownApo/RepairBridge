@@ -18,6 +18,15 @@
       <nav class="nav-header">
         <div class="nav-brand">
           <span>🌉 RepairBridge</span>
+          <span
+            id="backend-status-pill"
+            class="status-pill status-pill--unknown"
+            role="status"
+            aria-live="polite"
+          >
+            <span class="status-dot" aria-hidden="true"></span>
+            Backend: checking...
+          </span>
         </div>
         <div class="nav-links">
           <button type="button" class="nav-btn active" onclick="showSection('dashboard')">
@@ -48,7 +57,15 @@
       <!-- Dashboard Section -->
       <section id="dashboard" class="content-section active">
         <div class="section-header">
-          <h2>📊 Dashboard Overview</h2>
+          <h2>
+            <svg class="section-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+              <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+            </svg>
+            Dashboard Overview
+          </h2>
           <p>Welcome to your RepairBridge command center.</p>
         </div>
 
@@ -117,7 +134,15 @@
       <!-- Data Aggregator Section -->
       <section id="data-aggregator" class="content-section">
         <div class="section-header">
-          <h2>🗄️ Data Hub</h2>
+          <h2>
+            <svg class="section-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+              <path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"></path>
+              <path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"></path>
+              <path d="M3 19c0 1.66 4.03 3 9 3s9-1.34 9-3"></path>
+            </svg>
+            Data Hub
+          </h2>
           <p>Access vehicle data from multiple OEM sources.</p>
         </div>
 
@@ -156,10 +181,10 @@
               <h3>Data Analytics</h3>
               <button type="button" class="action-btn" onclick="refreshData()">🔄 Refresh</button>
             </div>
-            <div class="loading-placeholder" id="data-analytics-metrics">
-              <h4>Data Volume: 78% of monthly quota</h4>
-              <h4>Processing Speed: 2.3s avg</h4>
-              <h4>Active Connections: 3/4</h4>
+            <div class="loading-placeholder" id="data-analytics-metrics" aria-busy="true">
+              <div class="skeleton-line skeleton-title"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line short"></div>
             </div>
           </div>
         </div>
@@ -221,7 +246,16 @@
       <!-- Report View Section -->
       <section id="report-view" class="content-section">
         <div class="section-header report-view-header">
-          <h2 id="report-view-title">🧾 VIN Report</h2>
+          <h2 id="report-view-title">
+            <svg class="section-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <path d="M14 2v6h6"></path>
+              <path d="M16 13H8"></path>
+              <path d="M16 17H8"></path>
+              <path d="M10 9H8"></path>
+            </svg>
+            VIN Report
+          </h2>
           <p id="report-view-subtitle">Saved report details.</p>
           <div class="report-view-actions">
             <button type="button" class="action-btn" onclick="showSection('data-aggregator')">
@@ -264,7 +298,12 @@
       <!-- AR Diagnostics Section -->
       <section id="ar-diagnostics" class="content-section">
         <div class="section-header">
-          <h2>🔧 AR Diagnostics Assistant</h2>
+          <h2>
+            <svg class="section-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M22 12h-4l-3 9-4-18-3 9H2"></path>
+            </svg>
+            AR Diagnostics Assistant
+          </h2>
           <p>Augmented reality powered vehicle inspections.</p>
         </div>
 
@@ -274,12 +313,11 @@
               <h3>AR Camera Interface</h3>
               <span class="status-badge active" id="ar-status">Ready</span>
             </div>
-            <div class="loading-placeholder" id="ar-viewport">
-              <h3>📷 AR Camera View</h3>
-              <p>Position camera toward vehicle component</p>
-              <button type="button" class="action-btn" onclick="toggleAR()" id="ar-toggle">
-                ▶️ Start AR Session
-              </button>
+            <div class="loading-placeholder" id="ar-viewport" aria-busy="true">
+              <div class="skeleton-block"></div>
+              <div class="skeleton-line skeleton-title"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line short"></div>
             </div>
           </div>
 
@@ -329,7 +367,14 @@
       <!-- Other sections -->
       <section id="marketplace" class="content-section">
         <div class="section-header">
-          <h2>🛒 Tools & Certifications Marketplace</h2>
+          <h2>
+            <svg class="section-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"></path>
+            </svg>
+            Tools & Certifications Marketplace
+          </h2>
           <p>Access tools and training with group discounts.</p>
         </div>
 
@@ -428,40 +473,75 @@
 
       <section id="inventory" class="content-section">
         <div class="section-header">
-          <h2>📦 Inventory</h2>
+          <h2>
+            <svg class="section-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.3 7 12 12 20.7 7"></polyline>
+              <line x1="12" y1="22" x2="12" y2="12"></line>
+            </svg>
+            Inventory
+          </h2>
           <p>Parts inventory and supplier management.</p>
         </div>
-        <div class="loading-placeholder" id="inventory-panel">
-          <h3>Inventory System</h3>
-          <p>Stock tracking, auto-reorder, supplier integration</p>
+        <div class="loading-placeholder" id="inventory-panel" aria-busy="true">
+          <div class="skeleton-line skeleton-title"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
         </div>
       </section>
 
       <section id="analytics" class="content-section">
         <div class="section-header">
-          <h2>📈 Analytics</h2>
+          <h2>
+            <svg class="section-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <line x1="4" y1="19" x2="20" y2="19"></line>
+              <polyline points="4 15 8 11 12 15 16 9 20 13"></polyline>
+            </svg>
+            Analytics
+          </h2>
           <p>Performance metrics and insights.</p>
         </div>
-        <div class="loading-placeholder" id="analytics-panel">
-          <h3>Analytics Dashboard</h3>
-          <p>Revenue tracking, efficiency metrics, predictive analytics</p>
+        <div class="loading-placeholder" id="analytics-panel" aria-busy="true">
+          <div class="skeleton-line skeleton-title"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line medium"></div>
         </div>
       </section>
 
       <section id="compliance" class="content-section">
         <div class="section-header">
-          <h2>🛡️ Compliance</h2>
+          <h2>
+            <svg class="section-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 2l7 4v6c0 5-3.5 9.5-7 10-3.5-.5-7-5-7-10V6l7-4z"></path>
+              <path d="M9 12l2 2 4-4"></path>
+            </svg>
+            Compliance
+          </h2>
           <p>Security monitoring and compliance.</p>
         </div>
-        <div class="loading-placeholder" id="compliance-panel">
-          <h3>Compliance Vault</h3>
-          <p>AES-256 encryption, audit trails, GDPR compliance</p>
+        <div class="loading-placeholder" id="compliance-panel" aria-busy="true">
+          <div class="skeleton-line skeleton-title"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line long"></div>
         </div>
       </section>
 
       <section id="settings" class="content-section">
         <div class="section-header">
-          <h2>⚙️ Settings</h2>
+          <h2>
+            <svg class="section-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <line x1="4" y1="21" x2="4" y2="14"></line>
+              <line x1="4" y1="10" x2="4" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12" y2="3"></line>
+              <line x1="20" y1="21" x2="20" y2="16"></line>
+              <line x1="20" y1="12" x2="20" y2="3"></line>
+              <line x1="1" y1="14" x2="7" y2="14"></line>
+              <line x1="9" y1="8" x2="15" y2="8"></line>
+              <line x1="17" y1="16" x2="23" y2="16"></line>
+            </svg>
+            Settings
+          </h2>
           <p>Configure RepairBridge preferences.</p>
         </div>
         <div class="data-sources">
@@ -470,18 +550,19 @@
               <h3>Shop Account</h3>
               <span class="status-badge active" id="account-status">Active</span>
             </div>
-            <div class="loading-placeholder" id="account-panel">
-              <h4>Owner: —</h4>
-              <h4>Shop: —</h4>
-              <h4>Plan: —</h4>
+            <div class="loading-placeholder" id="account-panel" aria-busy="true">
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line medium"></div>
+              <div class="skeleton-line short"></div>
             </div>
           </div>
           <div class="source-card">
             <div class="source-header">
               <h3>Subscription Tiers</h3>
             </div>
-            <div class="loading-placeholder" id="billing-panel">
-              <p>Plans will show here when available.</p>
+            <div class="loading-placeholder" id="billing-panel" aria-busy="true">
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line short"></div>
             </div>
           </div>
         </div>
