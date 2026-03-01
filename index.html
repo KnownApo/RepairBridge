@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#4facfe" />
     <title>RepairBridge</title>
+    <link rel="preload" href="styles.css" as="style" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -160,6 +162,17 @@
               <h4>Active Connections: 3/4</h4>
             </div>
           </div>
+        </div>
+
+        <div class="widget">
+          <div class="widget-header">
+            <h3>Cache Status</h3>
+            <button type="button" class="action-btn" onclick="refreshCacheStatus()">
+              🔄 Refresh
+            </button>
+          </div>
+          <div id="cache-status" class="cache-status-grid"></div>
+          <p class="widget-note">Cache counts and TTL reflect backend cache tables.</p>
         </div>
 
         <div class="widget">
@@ -478,19 +491,19 @@
     <!-- Copyright -->
     <div class="copyright">©2025 RepairBridge</div>
 
-    <script src="modules/state.js"></script>
-    <script src="modules/config.js"></script>
-    <script src="modules/api.js"></script>
-    <script src="modules/data-adapters.js"></script>
-    <script src="modules/data.js"></script>
-    <script src="modules/auth.js"></script>
-    <script src="modules/services/camera-service.js"></script>
-    <script src="modules/ar-controller.js"></script>
-    <script src="modules/services/ui-services.js"></script>
-    <script src="modules/ui.js"></script>
-    <script src="modules/labor-estimates.js"></script>
-    <script src="modules/search.js"></script>
-    <script src="modules/reports.js"></script>
-    <script src="script.js"></script>
+    <script src="modules/state.js" defer></script>
+    <script src="modules/config.js" defer></script>
+    <script src="modules/api.js" defer></script>
+    <script src="modules/data-adapters.js" defer></script>
+    <script src="modules/data.js" defer></script>
+    <script src="modules/auth.js" defer></script>
+    <script src="modules/services/camera-service.js" defer></script>
+    <script src="modules/ar-controller.js" defer></script>
+    <script src="modules/services/ui-services.js" defer></script>
+    <script src="modules/ui.js" defer></script>
+    <script src="modules/labor-estimates.js" defer></script>
+    <script src="modules/search.js" defer></script>
+    <script src="modules/reports.js" defer></script>
+    <script src="script.js" defer></script>
   </body>
 </html>

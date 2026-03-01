@@ -50,7 +50,7 @@ body {
     #4facfe 100%
   ) !important;
   background-size: 400% 400%;
-  animation: gradientShift 15s ease infinite;
+  animation: gradientShift 20s ease infinite;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -172,6 +172,8 @@ body {
 .content-section {
   display: none;
   animation: fadeIn 0.5s ease-in-out;
+  content-visibility: auto;
+  contain-intrinsic-size: 800px;
 }
 
 .content-section.active {
@@ -287,6 +289,50 @@ body {
   font-weight: 600;
   color: #ffffff;
   margin-bottom: 20px;
+}
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.widget-header h3 {
+  margin-bottom: 0;
+}
+
+.cache-status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.cache-status-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cache-status-title {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.cache-status-meta {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.cache-status-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ffffff;
 }
 
 .activity-list {

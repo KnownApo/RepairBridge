@@ -81,6 +81,7 @@ async function loadAppData() {
   loadSearchHistory();
 
   loadComplianceData();
+  loadCacheStatus();
 }
 
 function getFallbackData() {
@@ -134,6 +135,72 @@ async function loadComplianceData({ refresh = false } = {}) {
   } catch (error) {
     console.warn("Compliance data unavailable:", error);
   }
+}
+
+function formatCacheTimestamp(value) {
+  if (!value) return "—";
+  const parsed = Date.parse(value);
+  if (Number.isNaN(parsed)) return value;
+  return new Date(parsed).toLocaleString();
+}
+
+async function loadCacheStatus({ refresh = false } = {}) {
+  const baseUrl = getBackendBaseUrl();
+  const cacheKey = "repairbridge:cache-status";
+  try {
+    const response = await RepairBridgeAPI.getJson(`${baseUrl}/api/v1/cache/status`, {
+      ttlMs: refresh ? 0 : 2 * 60 * 1000,
+      cacheKey,
+    });
+    const cacheStatus = response?.data;
+    if (!cacheStatus) return;
+
+    const currentData = getAppData() || {};
+    setAppData({
+      ...currentData,
+      cacheStatus,
+    });
+
+    hydrateCacheStatus();
+  } catch (error) {
+    console.warn("Cache status unavailable:", error);
+    hydrateCacheStatus();
+  }
+}
+
+function hydrateCacheStatus() {
+  const container = document.getElementById("cache-status");
+  if (!container) return;
+
+  const currentData = getAppData() || {};
+  const cacheStatus = currentData.cacheStatus;
+  if (!cacheStatus) {
+    renderEmptyState(container, {
+      icon: "🗄️",
+      title: "Cache status unavailable",
+      body: "Backend cache metrics will appear once the service is reachable.",
+    });
+    return;
+  }
+
+  container.innerHTML = `
+        <div class="cache-status-card">
+            <span class="cache-status-title">API Cache</span>
+            <span class="cache-status-value">${cacheStatus.apiCache?.count ?? 0}</span>
+            <span class="cache-status-meta">Latest: ${formatCacheTimestamp(
+              cacheStatus.apiCache?.latest
+            )}</span>
+            <span class="cache-status-meta">TTL: ${cacheStatus.ttlMinutes?.apiCache ?? "—"} min</span>
+        </div>
+        <div class="cache-status-card">
+            <span class="cache-status-title">Labor Estimates</span>
+            <span class="cache-status-value">${cacheStatus.laborEstimates?.count ?? 0}</span>
+            <span class="cache-status-meta">Latest: ${formatCacheTimestamp(
+              cacheStatus.laborEstimates?.latest
+            )}</span>
+            <span class="cache-status-meta">TTL: ${cacheStatus.ttlMinutes?.laborEstimates ?? "—"} min</span>
+        </div>
+    `;
 }
 
 function hydrateDashboard() {
@@ -419,6 +486,7 @@ function loadDashboardData() {
 }
 function loadDataAggregatorContent() {
   hydrateDataAggregator();
+  loadCacheStatus({ refresh: true });
 }
 function loadARDiagnostics() {
   /* placeholder for future camera binding */
@@ -428,10 +496,15 @@ function loadComplianceContent() {
   hydrateCompliance();
 }
 
+function refreshCacheStatus() {
+  loadCacheStatus({ refresh: true });
+}
+
 if (typeof window !== "undefined") {
   window.loadAppData = loadAppData;
   window.loadDashboardData = loadDashboardData;
   window.loadDataAggregatorContent = loadDataAggregatorContent;
   window.loadARDiagnostics = loadARDiagnostics;
   window.loadComplianceContent = loadComplianceContent;
+  window.refreshCacheStatus = refreshCacheStatus;
 }
