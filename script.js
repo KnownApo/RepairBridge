@@ -8,16 +8,20 @@ let cartItems = 0;
 let isARActive = false;
 
 // Initialize the application when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
+document.addEventListener('DOMContentLoaded', () => {
+    initializeApp().catch(err => console.error('Initialization failed', err));
 });
 
 /**
  * Main application initialization function
  * Sets up event listeners and initializes components
  */
-function initializeApp() {
+async function initializeApp() {
     console.log('RepairBridge Platform initializing...');
+
+    if (window.RepairBridgeAuth?.initializeAuth) {
+        await window.RepairBridgeAuth.initializeAuth();
+    }
 
     // Initialize navigation system
     initializeNavigation();
