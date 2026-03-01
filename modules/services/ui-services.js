@@ -215,13 +215,42 @@
   const navigationService = {
     initializeNavigation() {
       const navButtons = document.querySelectorAll(".nav-btn");
+      const navToggle = document.getElementById("nav-toggle");
+      const navOverlay = document.getElementById("nav-overlay");
+
+      const setNavOpen = (isOpen) => {
+        document.body.classList.toggle("nav-open", isOpen);
+        if (navToggle) {
+          navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        }
+      };
 
       navButtons.forEach((button) => {
         button.addEventListener("click", function () {
           const targetSection = this.getAttribute("data-section");
           console.log("Navigation button clicked:", targetSection);
           sectionService.showSection(targetSection);
+          setNavOpen(false);
         });
+      });
+
+      if (navToggle && !navToggle.dataset.bound) {
+        navToggle.dataset.bound = "true";
+        navToggle.addEventListener("click", () => {
+          const isOpen = document.body.classList.contains("nav-open");
+          setNavOpen(!isOpen);
+        });
+      }
+
+      if (navOverlay && !navOverlay.dataset.bound) {
+        navOverlay.dataset.bound = "true";
+        navOverlay.addEventListener("click", () => setNavOpen(false));
+      }
+
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 900) {
+          setNavOpen(false);
+        }
       });
 
       console.log("Navigation system initialized with", navButtons.length, "buttons");
@@ -376,6 +405,8 @@
           quotaLabel.textContent = newWidth + "% of monthly quota";
         }
       }
+
+      window.RepairBridgeData?.updatePanelTimestamp?.("data-aggregator");
     },
     updateRealTimeData() {
       const dataValues = document.querySelectorAll(".data-value");
@@ -656,6 +687,263 @@
     },
   };
 
+  const tourService = (() => {
+    const STORAGE_KEY = "rb_tour_seen_v1";
+    const steps = [
+      {
+        title: "Navigation & status",
+        body: "Jump between core workspaces and keep an eye on backend health.",
+        target: ".nav-header",
+        section: "dashboard",
+      },
+      {
+        title: "Dashboard metrics",
+        body: "Track live KPIs and recent activity at a glance.",
+        target: "#dashboard .stats-grid",
+        section: "dashboard",
+      },
+      {
+        title: "Data Hub search",
+        body: "Pull VIN intelligence and cache-backed data in seconds.",
+        target: "#data-aggregator .search-form",
+        section: "data-aggregator",
+      },
+      {
+        title: "AR Diagnostics",
+        body: "Launch camera-assisted inspections with live sensor telemetry.",
+        target: "#ar-diagnostics .data-sources",
+        section: "ar-diagnostics",
+      },
+      {
+        title: "Marketplace & cart",
+        body: "Curate tools, training, and parts while keeping totals visible.",
+        target: "#marketplace .cart-panel",
+        section: "marketplace",
+      },
+      {
+        title: "Compliance toolkit",
+        body: "Export reports and manage regulatory workflows anytime.",
+        target: "#compliance #compliance-panel",
+        section: "compliance",
+      },
+    ];
+
+    let overlay;
+    let spotlight;
+    let tooltip;
+    let currentIndex = 0;
+    let active = false;
+
+    function hasSeenTour() {
+      try {
+        return localStorage.getItem(STORAGE_KEY) === "1";
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function markSeen() {
+      try {
+        localStorage.setItem(STORAGE_KEY, "1");
+      } catch (error) {
+        console.warn("Unable to persist tour state", error);
+      }
+    }
+
+    function createOverlay() {
+      if (overlay) return;
+
+      overlay = document.createElement("div");
+      overlay.className = "rb-tour-overlay";
+      overlay.setAttribute("aria-hidden", "true");
+
+      spotlight = document.createElement("div");
+      spotlight.className = "rb-tour-spotlight";
+
+      tooltip = document.createElement("div");
+      tooltip.className = "rb-tour-tooltip";
+
+      overlay.appendChild(spotlight);
+      overlay.appendChild(tooltip);
+      document.body.appendChild(overlay);
+
+      overlay.addEventListener("click", (event) => {
+        if (event.target === overlay && overlay.dataset.mode === "intro") {
+          endTour(true);
+        }
+      });
+
+      window.addEventListener("resize", () => {
+        if (active) {
+          positionStep(steps[currentIndex]);
+        }
+      });
+    }
+
+    function lockScroll(locked) {
+      if (locked) {
+        document.body.classList.add("rb-tour-lock");
+      } else {
+        document.body.classList.remove("rb-tour-lock");
+      }
+    }
+
+    function showIntro() {
+      createOverlay();
+      active = false;
+      currentIndex = 0;
+      overlay.dataset.mode = "intro";
+      overlay.classList.add("active");
+      lockScroll(true);
+
+      spotlight.style.display = "none";
+      tooltip.classList.add("intro");
+      tooltip.innerHTML = `
+        <h4>Welcome to RepairBridge</h4>
+        <p>Want a 60-second tour of the dashboards, data hub, and AR tools?</p>
+        <div class="rb-tour-actions">
+          <button type="button" class="rb-tour-btn ghost" data-tour="skip">Skip</button>
+          <button type="button" class="rb-tour-btn primary" data-tour="start">Start tour</button>
+        </div>
+      `;
+
+      tooltip.querySelector('[data-tour="skip"]').addEventListener("click", () => endTour(true));
+      tooltip
+        .querySelector('[data-tour="start"]')
+        .addEventListener("click", () => startTour());
+    }
+
+    function startTour() {
+      overlay.dataset.mode = "tour";
+      tooltip.classList.remove("intro");
+      spotlight.style.display = "block";
+      active = true;
+      currentIndex = 0;
+      showStep(currentIndex);
+    }
+
+    function endTour(skip = false) {
+      if (!overlay) return;
+      overlay.classList.remove("active");
+      overlay.dataset.mode = "";
+      spotlight.style.display = "none";
+      tooltip.innerHTML = "";
+      tooltip.classList.remove("intro");
+      active = false;
+      lockScroll(false);
+      if (!skip) {
+        markSeen();
+      } else if (skip) {
+        markSeen();
+      }
+    }
+
+    function showStep(index) {
+      if (!active) return;
+      const step = steps[index];
+      if (!step) {
+        endTour();
+        return;
+      }
+
+      if (step.section) {
+        sectionService.showSection(step.section);
+      }
+
+      tooltip.innerHTML = `
+        <div class="rb-tour-step">Step ${index + 1} of ${steps.length}</div>
+        <h4>${step.title}</h4>
+        <p>${step.body}</p>
+        <div class="rb-tour-actions">
+          <button type="button" class="rb-tour-btn ghost" data-tour="back" ${
+            index === 0 ? "disabled" : ""
+          }>Back</button>
+          <button type="button" class="rb-tour-btn ghost" data-tour="skip">Skip</button>
+          <button type="button" class="rb-tour-btn primary" data-tour="next">${
+            index === steps.length - 1 ? "Finish" : "Next"
+          }</button>
+        </div>
+      `;
+
+      tooltip.querySelector('[data-tour="back"]').addEventListener("click", () => {
+        if (currentIndex > 0) {
+          currentIndex -= 1;
+          showStep(currentIndex);
+        }
+      });
+      tooltip.querySelector('[data-tour="skip"]').addEventListener("click", () => endTour(true));
+      tooltip.querySelector('[data-tour="next"]').addEventListener("click", () => {
+        if (currentIndex < steps.length - 1) {
+          currentIndex += 1;
+          showStep(currentIndex);
+        } else {
+          endTour();
+        }
+      });
+
+      setTimeout(() => positionStep(step), 120);
+    }
+
+    function positionStep(step) {
+      if (!overlay || !tooltip || !spotlight) return;
+
+      const target = document.querySelector(step.target);
+      if (!target) {
+        if (currentIndex < steps.length - 1) {
+          currentIndex += 1;
+          showStep(currentIndex);
+        } else {
+          endTour();
+        }
+        return;
+      }
+
+      const rect = target.getBoundingClientRect();
+      const padding = 10;
+      const top = Math.max(8, rect.top - padding);
+      const left = Math.max(8, rect.left - padding);
+      const width = Math.min(window.innerWidth - left - 8, rect.width + padding * 2);
+      const height = Math.min(window.innerHeight - top - 8, rect.height + padding * 2);
+
+      spotlight.style.top = `${top}px`;
+      spotlight.style.left = `${left}px`;
+      spotlight.style.width = `${width}px`;
+      spotlight.style.height = `${height}px`;
+
+      const tooltipRect = tooltip.getBoundingClientRect();
+      let tooltipTop = rect.bottom + 20;
+      let tooltipLeft = rect.left;
+
+      if (tooltipTop + tooltipRect.height > window.innerHeight - 16) {
+        tooltipTop = rect.top - tooltipRect.height - 20;
+      }
+
+      if (tooltipLeft + tooltipRect.width > window.innerWidth - 16) {
+        tooltipLeft = window.innerWidth - tooltipRect.width - 16;
+      }
+
+      if (tooltipTop < 16) {
+        tooltipTop = 16;
+      }
+
+      if (tooltipLeft < 16) {
+        tooltipLeft = 16;
+      }
+
+      tooltip.style.top = `${tooltipTop}px`;
+      tooltip.style.left = `${tooltipLeft}px`;
+    }
+
+    function initializeGuidedTour() {
+      if (hasSeenTour()) return;
+      showIntro();
+    }
+
+    return {
+      initializeGuidedTour,
+    };
+  })();
+
   const legacyActionService = {
     quickAction(action) {
       switch (action) {
@@ -770,5 +1058,6 @@
   window.RepairBridgeServices.voice = voiceService;
   window.RepairBridgeServices.competitive = competitiveService;
   window.RepairBridgeServices.section = sectionService;
+  window.RepairBridgeServices.tour = tourService;
   window.RepairBridgeServices.legacyActions = legacyActionService;
 })();

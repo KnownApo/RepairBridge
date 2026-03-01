@@ -28,30 +28,43 @@
             Backend: checking...
           </span>
         </div>
-        <div class="nav-links">
-          <button type="button" class="nav-btn active" onclick="showSection('dashboard')">
+        <button
+          type="button"
+          class="nav-toggle"
+          id="nav-toggle"
+          aria-label="Toggle navigation"
+          aria-controls="nav-links"
+          aria-expanded="false"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="nav-links" id="nav-links">
+          <button type="button" class="nav-btn active" data-section="dashboard">
             Dashboard
           </button>
-          <button type="button" class="nav-btn" onclick="showSection('data-aggregator')">
+          <button type="button" class="nav-btn" data-section="data-aggregator">
             Data Hub
           </button>
-          <button type="button" class="nav-btn" onclick="showSection('ar-diagnostics')">
+          <button type="button" class="nav-btn" data-section="ar-diagnostics">
             AR Diagnostics
           </button>
-          <button type="button" class="nav-btn" onclick="showSection('marketplace')">
+          <button type="button" class="nav-btn" data-section="marketplace">
             Marketplace
           </button>
-          <button type="button" class="nav-btn" onclick="showSection('inventory')">
+          <button type="button" class="nav-btn" data-section="inventory">
             Inventory
           </button>
-          <button type="button" class="nav-btn" onclick="showSection('analytics')">
+          <button type="button" class="nav-btn" data-section="analytics">
             Analytics
           </button>
-          <button type="button" class="nav-btn" onclick="showSection('compliance')">
+          <button type="button" class="nav-btn" data-section="compliance">
             Compliance
           </button>
-          <button type="button" class="nav-btn" onclick="showSection('settings')">Settings</button>
+          <button type="button" class="nav-btn" data-section="settings">Settings</button>
         </div>
+        <div class="nav-overlay" id="nav-overlay"></div>
       </nav>
 
       <div id="offline-banner" class="offline-banner" role="status" aria-live="polite" hidden></div>
