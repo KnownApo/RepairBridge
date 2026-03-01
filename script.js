@@ -79,6 +79,7 @@ async function loadAppData() {
     hydrateInventory();
     hydrateAnalytics();
     hydrateCompliance();
+    loadSearchHistory();
 }
 
 function getFallbackData() {
@@ -721,6 +722,7 @@ function displayVinResults(vinData, recalls, complaints, tsbs) {
     `;
 
     window._rb_lastVinReport = { vinData, recalls, complaints, tsbs };
+    saveSearchHistory(vinData, recallCount, complaintCount, tsbCount);
 
     showNotification(`VIN lookup complete — ${recallCount} recalls, ${complaintCount} complaints`, 'success');
 }
@@ -759,10 +761,75 @@ function downloadVinReport() {
     a.download = `vin-report-${vinData.vin}.txt`;
     a.click();
     URL.revokeObjectURL(url);
+
+    saveReportToHistory(vinData, recalls.length, complaints.length, Array.isArray(tsbs) ? tsbs.length : null);
+}
+
+function saveSearchHistory(vinData, recallCount, complaintCount, tsbCount) {
+    const entry = {
+        vin: vinData.vin,
+        title: `${vinData.year} ${vinData.make} ${vinData.model}`,
+        recalls: recallCount,
+        complaints: complaintCount,
+        tsbs: tsbCount,
+        ts: Date.now()
+    };
+
+    const history = JSON.parse(localStorage.getItem('rb_search_history') || '[]');
+    const filtered = history.filter(h => h.vin !== entry.vin);
+    filtered.unshift(entry);
+    localStorage.setItem('rb_search_history', JSON.stringify(filtered.slice(0, 10)));
+    renderSearchHistory();
+}
+
+function saveReportToHistory(vinData, recallCount, complaintCount, tsbCount) {
+    const report = {
+        vin: vinData.vin,
+        title: `${vinData.year} ${vinData.make} ${vinData.model}`,
+        recalls: recallCount,
+        complaints: complaintCount,
+        tsbs: tsbCount,
+        downloadedAt: Date.now()
+    };
+    const reports = JSON.parse(localStorage.getItem('rb_saved_reports') || '[]');
+    reports.unshift(report);
+    localStorage.setItem('rb_saved_reports', JSON.stringify(reports.slice(0, 20)));
+}
+
+function loadSearchHistory() {
+    renderSearchHistory();
+}
+
+function renderSearchHistory() {
+    const container = document.getElementById('search-history');
+    if (!container) return;
+
+    const history = JSON.parse(localStorage.getItem('rb_search_history') || '[]');
+    if (!history.length) {
+        container.innerHTML = '<div class="activity-item"><span>No searches yet</span><small>Run a VIN lookup</small></div>';
+        return;
+    }
+
+    container.innerHTML = history.map(item => {
+        const tsbText = item.tsbs === null || item.tsbs === undefined ? 'TSBs: —' : `TSBs: ${item.tsbs}`;
+        return `
+            <div class="activity-item">
+                <span>${item.title}</span>
+                <small>VIN: ${item.vin} • Recalls: ${item.recalls} • Complaints: ${item.complaints} • ${tsbText}</small>
+            </div>
+        `;
+    }).join('');
+}
+
+function clearSearchHistory() {
+    localStorage.removeItem('rb_search_history');
+    renderSearchHistory();
+    showNotification('Search history cleared', 'info');
 }
 
 // expose for inline onclick
 window.downloadVinReport = downloadVinReport;
+window.clearSearchHistory = clearSearchHistory;
 
 /**
  * Starts AR diagnostic session
