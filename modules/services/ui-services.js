@@ -253,7 +253,60 @@
         }
       });
 
+      navigationService.initializeKeyboardShortcuts();
+
       console.log("Navigation system initialized with", navButtons.length, "buttons");
+    },
+    initializeKeyboardShortcuts() {
+      if (document.body.dataset.shortcutsBound === "true") return;
+      document.body.dataset.shortcutsBound = "true";
+
+      const isEditableTarget = (target) =>
+        target?.isContentEditable ||
+        target?.closest?.("input, textarea, select, [contenteditable='true']");
+
+      document.addEventListener("keydown", (event) => {
+        if (isEditableTarget(event.target)) return;
+
+        const key = event.key.toLowerCase();
+        const isMac = /mac|iphone|ipad|ipod/i.test(navigator.platform || "");
+        const isMod = isMac ? event.metaKey : event.ctrlKey;
+
+        if (isMod && key === "k") {
+          event.preventDefault();
+
+          const navButtons = Array.from(document.querySelectorAll(".nav-btn"));
+          if (!navButtons.length) return;
+
+          const navToggle = document.getElementById("nav-toggle");
+          const setNavOpen = (isOpen) => {
+            document.body.classList.toggle("nav-open", isOpen);
+            if (navToggle) {
+              navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+            }
+          };
+
+          if (window.innerWidth <= 900) {
+            setNavOpen(true);
+          }
+
+          const activeButton =
+            document.querySelector(".nav-btn.active") || navButtons[0];
+          activeButton?.focus();
+          return;
+        }
+
+        if (key === "/" && !event.altKey && !event.metaKey && !event.ctrlKey) {
+          event.preventDefault();
+          sectionService.showSection("data-aggregator");
+          const searchInput = document.getElementById("vehicle-search");
+          setTimeout(() => {
+            if (!searchInput) return;
+            searchInput.focus();
+            searchInput.select();
+          }, 60);
+        }
+      });
     },
     animateSection(sectionId) {
       const section = document.getElementById(sectionId);
