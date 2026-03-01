@@ -348,6 +348,13 @@ function displayVinResults(vinData, recalls, complaints, tsbs) {
         </div>
         <div class="widget" id="labor-estimate-panel" style="margin-top:16px;">
             <h4 style="color:#fff;margin-bottom:8px;">Repair Estimate</h4>
+            <div class="labor-estimate-controls">
+                <input type="text" id="labor-procedure" class="search-input" placeholder="Procedure (e.g., front brake pads)">
+                <input type="number" id="labor-rate" class="search-input" placeholder="Labor rate (USD/hr)">
+                <input type="text" id="labor-region" class="search-input" placeholder="Region (city/state)">
+                <input type="number" id="labor-mileage" class="search-input" placeholder="Mileage">
+                <button type="button" class="action-btn" onclick="refreshLaborEstimate()">🔄 Refresh estimate</button>
+            </div>
             <p id="labor-estimate-status" style="color:#fff;">Checking connected labor estimate providers...</p>
             <ul id="labor-estimate-list" style="color:#fff; padding-left:18px;">
                 <li>Labor hours: —</li>
@@ -372,7 +379,20 @@ function displayVinResults(vinData, recalls, complaints, tsbs) {
   );
 }
 
-async function loadLaborEstimatePanel(vinData) {
+function getLaborInputs() {
+  const procedure = document.getElementById("labor-procedure")?.value?.trim();
+  const laborRateRaw = document.getElementById("labor-rate")?.value;
+  const region = document.getElementById("labor-region")?.value?.trim();
+  const mileageRaw = document.getElementById("labor-mileage")?.value;
+  return {
+    procedure: procedure || null,
+    laborRate: laborRateRaw ? Number(laborRateRaw) : null,
+    region: region || null,
+    mileage: mileageRaw ? Number(mileageRaw) : null,
+  };
+}
+
+async function loadLaborEstimatePanel(vinData, overrides = {}) {
   const statusEl = document.getElementById("labor-estimate-status");
   const listEl = document.getElementById("labor-estimate-list");
   const metaEl = document.getElementById("labor-estimate-meta");
@@ -386,8 +406,10 @@ async function loadLaborEstimatePanel(vinData) {
     return;
   }
 
+  const context = { ...getLaborInputs(), ...overrides, vinData };
+
   try {
-    const estimate = await RepairBridgeLabor.getEstimate({ vinData });
+    const estimate = await RepairBridgeLabor.getEstimate(context);
     if (!estimate || estimate.status !== "ok") {
       statusEl.textContent = estimate?.reason || "No labor estimate providers connected.";
       if (metaEl) metaEl.textContent = "";
@@ -410,20 +432,49 @@ async function loadLaborEstimatePanel(vinData) {
       estimate.laborHours !== undefined && estimate.laborHours !== null
         ? `${estimate.laborHours} hrs`
         : "—";
+    const hoursRange = Array.isArray(estimate.laborHoursRange)
+      ? `${estimate.laborHoursRange[0]}–${estimate.laborHoursRange[1]} hrs`
+      : null;
+    const partsRange = Array.isArray(estimate.partsEstimateRange)
+      ? `${fmtCurrency(estimate.partsEstimateRange[0])}–${fmtCurrency(
+          estimate.partsEstimateRange[1]
+        )}`
+      : null;
 
     listEl.innerHTML = `
-            <li>Labor hours: ${hoursText}</li>
-            <li>Parts estimate: ${fmtCurrency(estimate.partsEstimate)}</li>
+            <li>Labor hours: ${hoursText}${hoursRange ? ` (range ${hoursRange})` : ""}</li>
+            <li>Labor rate: ${estimate.laborRate ? fmtCurrency(estimate.laborRate) + "/hr" : "—"}</li>
+            <li>Parts estimate: ${fmtCurrency(estimate.partsEstimate)}${partsRange ? ` (range ${partsRange})` : ""}</li>
+            <li>Shop fees: ${fmtCurrency(estimate.miscFees)}</li>
             <li>Total estimate: ${fmtCurrency(estimate.totalEstimate)}</li>
+            <li>Confidence: ${estimate.confidence || "—"}</li>
         `;
 
+    const sources = Array.isArray(estimate.sourcesUsed) ? estimate.sourcesUsed.join(", ") : "";
     statusEl.textContent = `Source: ${estimate.providerName || estimate.provider || "Labor provider"}`;
-    if (metaEl) metaEl.textContent = estimate.notes || "";
+    if (metaEl) {
+      metaEl.textContent = [
+        estimate.notes,
+        estimate.timeToComplete,
+        sources && `Signals: ${sources}`,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+    }
   } catch (err) {
     console.warn("Labor estimate lookup failed", err);
     statusEl.textContent = "Labor estimate unavailable.";
     if (metaEl) metaEl.textContent = "";
   }
+}
+
+function refreshLaborEstimate() {
+  const report = getLastVinReport();
+  if (!report?.vinData) {
+    showNotification("Run a VIN search first.", "warning");
+    return;
+  }
+  loadLaborEstimatePanel(report.vinData, getLaborInputs());
 }
 
 function getBackendBaseUrl() {
@@ -623,3 +674,4 @@ window.loadSearchHistory = loadSearchHistory;
 window.searchVehicle = searchVehicle;
 window.clearSearchHistory = clearSearchHistory;
 window.saveTsbFallback = saveTsbFallback;
+window.refreshLaborEstimate = refreshLaborEstimate;

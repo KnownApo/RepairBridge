@@ -15,6 +15,8 @@ const DEFAULT_COMPLIANCE = {
   nextReview: "2026-03-20",
 };
 
+const LABOR_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+
 function getComplianceStatus() {
   const row = db
     .prepare(
@@ -39,6 +41,80 @@ function getComplianceStatus() {
     DEFAULT_COMPLIANCE.nextReview
   );
   return { ...DEFAULT_COMPLIANCE };
+}
+
+function buildLaborEstimate({ vinData, procedure, region, laborRate, mileage }) {
+  const defaultRate = 135;
+  const resolvedRate = Number(laborRate) || defaultRate;
+  const baseHours = procedure ? 2.8 : 2.2;
+  const vinYear = Number(vinData?.ModelYear || vinData?.modelYear || 0) || null;
+  const ageFactor = vinYear ? Math.max(0.85, Math.min(1.2, (2026 - vinYear) / 12 + 0.9)) : 1;
+  const mileageFactor = mileage ? Math.max(0.85, Math.min(1.15, mileage / 90000 + 0.9)) : 1;
+
+  const laborHours = Number((baseHours * ageFactor * mileageFactor).toFixed(1));
+  const laborHoursRange = [
+    Number(Math.max(0.5, laborHours - 0.6).toFixed(1)),
+    Number((laborHours + 0.8).toFixed(1)),
+  ];
+
+  const partsEstimate = Math.round(185 * ageFactor);
+  const partsEstimateRange = [Math.round(partsEstimate * 0.75), Math.round(partsEstimate * 1.35)];
+
+  const laborSubtotal = laborHours * resolvedRate;
+  const miscFees = Math.round(laborSubtotal * 0.04);
+  const totalEstimate = Math.round(laborSubtotal + partsEstimate + miscFees);
+
+  return {
+    laborHours,
+    laborHoursRange,
+    laborRate: resolvedRate,
+    partsEstimate,
+    partsEstimateRange,
+    miscFees,
+    totalEstimate,
+    currency: "USD",
+    confidence: procedure ? "medium" : "low",
+    timeToComplete: `${Math.max(1, Math.round(laborHours))}-${Math.max(
+      2,
+      Math.round(laborHours + 1)
+    )} hrs bay time`,
+    warrantyTime: "12 mo / 12k mi (shop default)",
+    insights: [
+      "Estimate includes labor rate + parts range + shop fees.",
+      "Add OEM labor guide for tighter confidence.",
+    ],
+    sourcesUsed: ["baseline-model", "shop-rate"],
+    notes:
+      "Baseline estimate. Connect a labor provider for OEM procedure times and parts catalogs.",
+  };
+}
+
+function getLaborCacheKey({ vin, procedure, region }) {
+  return [vin || "unknown", procedure || "general", region || "default"].join("::");
+}
+
+function getCachedLaborEstimate(cacheKey) {
+  const row = db
+    .prepare(
+      "SELECT payload_json, created_at FROM labor_estimates WHERE cache_key = ? ORDER BY created_at DESC LIMIT 1"
+    )
+    .get(cacheKey);
+  if (!row?.payload_json) return null;
+  const createdAt = new Date(row.created_at).getTime();
+  if (!createdAt || Date.now() - createdAt > LABOR_CACHE_TTL_MS) return null;
+  try {
+    return JSON.parse(row.payload_json);
+  } catch (err) {
+    console.warn("Failed to parse cached labor estimate", err);
+    return null;
+  }
+}
+
+function storeLaborEstimate(cacheKey, payload, { vin, procedure, region } = {}) {
+  const id = crypto.randomUUID();
+  db.prepare(
+    "INSERT INTO labor_estimates (id, cache_key, vin, procedure, region, payload_json) VALUES (?, ?, ?, ?, ?, ?)"
+  ).run(id, cacheKey, vin || null, procedure || null, region || null, JSON.stringify(payload));
 }
 
 app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
@@ -141,6 +217,20 @@ app.post("/api/v1/reports", (req, res) => {
     summary || null
   );
   res.status(201).json({ data: { id, vinLookupId, summary: summary || null } });
+});
+
+app.post("/api/v1/labor-estimates", (req, res) => {
+  const { vinData, procedure, region, laborRate, mileage } = req.body || {};
+  const vin = vinData?.VIN || vinData?.vin || null;
+  const cacheKey = getLaborCacheKey({ vin, procedure, region });
+  const cached = getCachedLaborEstimate(cacheKey);
+  if (cached) {
+    return res.json({ data: cached, cached: true });
+  }
+
+  const payload = buildLaborEstimate({ vinData, procedure, region, laborRate, mileage });
+  storeLaborEstimate(cacheKey, payload, { vin, procedure, region });
+  res.json({ data: payload, cached: false });
 });
 
 app.get("/api/v1/compliance", (req, res) => {

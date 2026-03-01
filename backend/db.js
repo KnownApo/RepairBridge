@@ -60,6 +60,16 @@ db.exec(`
     payload_json TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS labor_estimates (
+    id TEXT PRIMARY KEY,
+    cache_key TEXT NOT NULL,
+    vin TEXT,
+    procedure TEXT,
+    region TEXT,
+    payload_json TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
 `);
 
 export default db;

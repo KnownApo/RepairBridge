@@ -12,6 +12,7 @@ const RepairBridgeConfig = (() => {
     tsbsBase: "https://api.nhtsa.gov/tsbs/tsbsByVehicle",
     makesBase: "https://vpic.nhtsa.dot.gov/api/vehicles/getallmakes",
     modelsForMakeBase: "https://vpic.nhtsa.dot.gov/api/vehicles/getmodelsformake",
+    laborEstimatesBase: "http://localhost:5050/api/v1/labor-estimates",
   };
 
   const storageKey = "rb_api_endpoints";
