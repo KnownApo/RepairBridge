@@ -94,7 +94,7 @@ RepairBridge/
 ├── script.js               # Main JavaScript logic
 ├── prototypes/             # Archived prototype pages and scripts
 ├── modules/                # Active JavaScript modules
-├── modules/unused/         # Archived/unused modules
+├── modules/unused/         # Archived/unused modules (see modules/unused/README.md)
 ├── src/                    # Source utilities and assets
 ├── data/                   # Sample dataset files
 └── README.md               # Project documentation
@@ -153,6 +153,19 @@ RepairBridge/
 - Data refresh intervals can be adjusted
 - Notification system can be extended
 
+### API Endpoints
+- VIN/recall/complaint/TSB endpoints are configurable via `modules/config.js`
+- Override endpoints in the browser console with:
+  ```js
+  RepairBridgeConfig.setEndpoints({
+    vinDecodeBase: 'https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvaluesextended',
+    recallsBase: 'https://api.nhtsa.gov/recalls/recallsByVehicle',
+    complaintsBase: 'https://api.nhtsa.gov/complaints/complaintsByVehicle',
+    tsbsBase: 'https://api.nhtsa.gov/tsbs/tsbsByVehicle'
+  })
+  ```
+- Reset to defaults with `RepairBridgeConfig.resetEndpoints()`
+
 ## 📊 Analytics & Tracking
 
 The platform includes basic analytics tracking for:
@@ -175,6 +188,10 @@ The platform includes basic analytics tracking for:
 - Integration with shop management systems
 - Mobile app development
 - Voice-activated controls
+
+## 🧪 Archived Competitive Prototypes
+
+The earlier competitive feature prototypes (telematics, blockchain verification, voice commands, AI diagnostic assistant, customer portal, and related CSS) are archived in `prototypes/competitive-features/`. They are not wired into `index.html` or `script.js` by default.
 
 ## 🐛 Known Issues
 

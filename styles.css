@@ -1276,3 +1276,21 @@ body {
         justify-content: space-between;
     }
 }
+
+.tsb-fallback-controls {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    margin-bottom: 12px;
+}
+
+.tsb-fallback .report-list li {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tsb-fallback .report-list a {
+    color: #9fd1ff;
+    word-break: break-all;
+}
