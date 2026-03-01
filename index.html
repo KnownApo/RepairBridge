@@ -344,9 +344,26 @@
                 <h2>⚙️ Settings</h2>
                 <p>Configure RepairBridge preferences</p>
             </div>
-            <div class="loading-placeholder">
-                <h3>System Settings</h3>
-                <p>User management, API settings, theme customization</p>
+            <div class="data-sources">
+                <div class="source-card">
+                    <div class="source-header">
+                        <h3>Shop Account</h3>
+                        <span class="status-badge active" id="account-status">Active</span>
+                    </div>
+                    <div class="loading-placeholder" id="account-panel">
+                        <h4>Owner: —</h4>
+                        <h4>Shop: —</h4>
+                        <h4>Plan: —</h4>
+                    </div>
+                </div>
+                <div class="source-card">
+                    <div class="source-header">
+                        <h3>Subscription Tiers</h3>
+                    </div>
+                    <div class="loading-placeholder" id="billing-panel">
+                        <p>Plans will appear here.</p>
+                    </div>
+                </div>
             </div>
         </section>
     </div>

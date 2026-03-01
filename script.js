@@ -79,6 +79,7 @@ async function loadAppData() {
     hydrateInventory();
     hydrateAnalytics();
     hydrateCompliance();
+    hydrateSettings();
     loadSearchHistory();
 }
 
@@ -224,6 +225,38 @@ function hydrateCompliance() {
         <h3 style="margin-top:12px;">Next Review</h3>
         <p>${appData.compliance.nextReview}</p>
     `;
+}
+
+function hydrateSettings() {
+    if (!appData) return;
+
+    const account = appData.account || {};
+    const accountPanel = document.getElementById('account-panel');
+    const accountStatus = document.getElementById('account-status');
+    if (accountPanel) {
+        accountPanel.innerHTML = `
+            <h4>Owner: ${account.owner || '—'}</h4>
+            <h4>Shop: ${account.shop || '—'}</h4>
+            <h4>Plan: ${account.plan || '—'}</h4>
+        `;
+    }
+    if (accountStatus) {
+        accountStatus.textContent = account.status === 'active' ? 'Active' : 'Pending';
+        accountStatus.className = account.status === 'active' ? 'status-badge active' : 'status-badge';
+    }
+
+    const billingPanel = document.getElementById('billing-panel');
+    if (billingPanel && Array.isArray(appData.plans)) {
+        billingPanel.innerHTML = appData.plans.map(plan => {
+            const features = (plan.features || []).map(f => `<li>${f}</li>`).join('');
+            return `
+                <div class="source-item" style="flex-direction:column; align-items:flex-start;">
+                    <strong style="color:#fff;">${plan.name} — ${plan.price}</strong>
+                    <ul style="color:#fff; padding-left:18px; margin-top:6px;">${features}</ul>
+                </div>
+            `;
+        }).join('');
+    }
 }
 
 // Section loaders (used by navigation)

@@ -64,5 +64,16 @@
     "lastAudit": "2026-02-20",
     "openFindings": 0,
     "nextReview": "2026-03-20"
-  }
+  },
+  "account": {
+    "owner": "Michael",
+    "shop": "RepairBridge Demo Shop",
+    "plan": "Pro",
+    "status": "active"
+  },
+  "plans": [
+    {"name": "Starter", "price": "$49/mo", "features": ["VIN + recalls", "5 reports/month"]},
+    {"name": "Pro", "price": "$149/mo", "features": ["Unlimited VIN reports", "TSB lookup", "Inventory alerts"]},
+    {"name": "Fleet", "price": "$399/mo", "features": ["Multi-shop", "Fleet reports", "Priority support"]}
+  ]
 }
