@@ -363,6 +363,31 @@ app.get("/api/v1/nhtsa/tsbs", async (req, res) => {
   }
 });
 
+app.get("/api/v1/cache/status", (req, res) => {
+  const apiCount = db.prepare("SELECT COUNT(*) as count FROM api_cache").get();
+  const laborCount = db.prepare("SELECT COUNT(*) as count FROM labor_estimates").get();
+  const apiLatest = db
+    .prepare("SELECT created_at FROM api_cache ORDER BY created_at DESC LIMIT 1")
+    .get();
+  const laborLatest = db
+    .prepare("SELECT created_at FROM labor_estimates ORDER BY created_at DESC LIMIT 1")
+    .get();
+
+  res.json({
+    data: {
+      apiCache: { count: apiCount?.count || 0, latest: apiLatest?.created_at || null },
+      laborEstimates: {
+        count: laborCount?.count || 0,
+        latest: laborLatest?.created_at || null,
+      },
+      ttlMinutes: {
+        apiCache: Math.ceil(API_CACHE_TTL_MS / 60000),
+        laborEstimates: Math.ceil(LABOR_CACHE_TTL_MS / 60000),
+      },
+    },
+  });
+});
+
 app.get("/api/v1/compliance", (req, res) => {
   res.json({ data: getComplianceStatus() });
 });

@@ -104,6 +104,7 @@ npm run dev
   - `GET /api/v1/nhtsa/recalls?make=&model=&modelYear=`
   - `GET /api/v1/nhtsa/complaints?make=&model=&modelYear=`
   - `GET /api/v1/nhtsa/tsbs?make=&model=&modelYear=`
+- Cache status: `GET /api/v1/cache/status`
 - Configure `PORT` or `CORS_ORIGIN` via `.env` (see `.env.example`).
 
 ### Minimal DB Schema (MVP)
