@@ -54,6 +54,8 @@
         </div>
       </nav>
 
+      <div id="offline-banner" class="offline-banner" role="status" aria-live="polite" hidden></div>
+
       <!-- Dashboard Section -->
       <section id="dashboard" class="content-section active">
         <div class="section-header">
@@ -67,6 +69,9 @@
             Dashboard Overview
           </h2>
           <p>Welcome to your RepairBridge command center.</p>
+          <div class="section-meta">
+            <span class="last-updated" data-panel="dashboard">Last updated: —</span>
+          </div>
         </div>
 
         <div class="stats-grid">
@@ -144,6 +149,9 @@
             Data Hub
           </h2>
           <p>Access vehicle data from multiple OEM sources.</p>
+          <div class="section-meta">
+            <span class="last-updated" data-panel="data-aggregator">Last updated: —</span>
+          </div>
         </div>
 
         <div class="data-sources">
@@ -257,6 +265,9 @@
             VIN Report
           </h2>
           <p id="report-view-subtitle">Saved report details.</p>
+          <div class="section-meta">
+            <span class="last-updated" data-panel="report-view">Last updated: —</span>
+          </div>
           <div class="report-view-actions">
             <button type="button" class="action-btn" onclick="showSection('data-aggregator')">
               ← Back to Data Hub
@@ -305,6 +316,9 @@
             AR Diagnostics Assistant
           </h2>
           <p>Augmented reality powered vehicle inspections.</p>
+          <div class="section-meta">
+            <span class="last-updated" data-panel="ar-diagnostics">Last updated: —</span>
+          </div>
         </div>
 
         <div class="data-sources">
@@ -376,6 +390,9 @@
             Tools & Certifications Marketplace
           </h2>
           <p>Access tools and training with group discounts.</p>
+          <div class="section-meta">
+            <span class="last-updated" data-panel="marketplace">Last updated: —</span>
+          </div>
         </div>
 
         <div class="cart-panel" id="cart-panel">
@@ -482,6 +499,9 @@
             Inventory
           </h2>
           <p>Parts inventory and supplier management.</p>
+          <div class="section-meta">
+            <span class="last-updated" data-panel="inventory">Last updated: —</span>
+          </div>
         </div>
         <div class="loading-placeholder" id="inventory-panel" aria-busy="true">
           <div class="skeleton-line skeleton-title"></div>
@@ -500,6 +520,9 @@
             Analytics
           </h2>
           <p>Performance metrics and insights.</p>
+          <div class="section-meta">
+            <span class="last-updated" data-panel="analytics">Last updated: —</span>
+          </div>
         </div>
         <div class="loading-placeholder" id="analytics-panel" aria-busy="true">
           <div class="skeleton-line skeleton-title"></div>
@@ -518,6 +541,9 @@
             Compliance
           </h2>
           <p>Security monitoring and compliance.</p>
+          <div class="section-meta">
+            <span class="last-updated" data-panel="compliance">Last updated: —</span>
+          </div>
         </div>
         <div class="loading-placeholder" id="compliance-panel" aria-busy="true">
           <div class="skeleton-line skeleton-title"></div>
@@ -543,6 +569,9 @@
             Settings
           </h2>
           <p>Configure RepairBridge preferences.</p>
+          <div class="section-meta">
+            <span class="last-updated" data-panel="settings">Last updated: —</span>
+          </div>
         </div>
         <div class="data-sources">
           <div class="source-card">
@@ -565,6 +594,25 @@
               <div class="skeleton-line short"></div>
             </div>
           </div>
+          <div class="source-card">
+            <div class="source-header">
+              <h3>Experience Mode</h3>
+            </div>
+            <div class="settings-card">
+              <p class="settings-description">
+                Use mock data for demos. Turn off to use live API connections.
+              </p>
+              <label class="toggle-switch" for="demo-mode-toggle">
+                <input type="checkbox" id="demo-mode-toggle" />
+                <span class="slider" aria-hidden="true"></span>
+                <span class="toggle-label">Demo mode</span>
+              </label>
+              <div class="settings-meta" id="demo-mode-status">Live data enabled</div>
+              <button type="button" class="action-btn btn-spaced" id="demo-reset-btn">
+                Reset demo data
+              </button>
+            </div>
+          </div>
         </div>
       </section>
     </div>
@@ -585,6 +633,7 @@
     <script src="modules/labor-estimates.js" defer></script>
     <script src="modules/search.js" defer></script>
     <script src="modules/reports.js" defer></script>
+    <script src="modules/settings.js" defer></script>
     <script src="script.js" defer></script>
   </body>
 </html>
