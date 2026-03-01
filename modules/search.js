@@ -392,6 +392,28 @@ function getLaborInputs() {
   };
 }
 
+function normalizeLaborInputs() {
+  const inputs = getLaborInputs();
+  const errors = [];
+
+  if (inputs.laborRate !== null && (Number.isNaN(inputs.laborRate) || inputs.laborRate <= 0)) {
+    errors.push("Labor rate must be a positive number.");
+  }
+
+  if (inputs.mileage !== null && (Number.isNaN(inputs.mileage) || inputs.mileage < 0)) {
+    errors.push("Mileage must be a positive number.");
+  }
+
+  return { inputs, errors };
+}
+
+function ensureLaborDefaults() {
+  const laborRateField = document.getElementById("labor-rate");
+  if (laborRateField && !laborRateField.value) {
+    laborRateField.value = "135";
+  }
+}
+
 async function loadLaborEstimatePanel(vinData, overrides = {}) {
   const statusEl = document.getElementById("labor-estimate-status");
   const listEl = document.getElementById("labor-estimate-list");
@@ -406,7 +428,15 @@ async function loadLaborEstimatePanel(vinData, overrides = {}) {
     return;
   }
 
-  const context = { ...getLaborInputs(), ...overrides, vinData };
+  ensureLaborDefaults();
+  const { inputs, errors } = normalizeLaborInputs();
+  if (errors.length) {
+    statusEl.textContent = errors.join(" ");
+    if (metaEl) metaEl.textContent = "";
+    return;
+  }
+
+  const context = { ...inputs, ...overrides, vinData };
 
   try {
     const estimate = await RepairBridgeLabor.getEstimate(context);
@@ -474,7 +504,12 @@ function refreshLaborEstimate() {
     showNotification("Run a VIN search first.", "warning");
     return;
   }
-  loadLaborEstimatePanel(report.vinData, getLaborInputs());
+  const { inputs, errors } = normalizeLaborInputs();
+  if (errors.length) {
+    showNotification(errors.join(" "), "warning");
+    return;
+  }
+  loadLaborEstimatePanel(report.vinData, inputs);
 }
 
 function getBackendBaseUrl() {
