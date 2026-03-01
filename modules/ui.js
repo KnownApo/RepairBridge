@@ -224,42 +224,115 @@ function updateRealTimeData() {
     });
 }
 
-function startARSession() {
-    const arPlaceholder = document.querySelector('.ar-placeholder');
+let arStream = null;
+let arVideoEl = null;
 
-    showNotification('Initializing AR camera...', 'info');
-
-    setTimeout(() => {
-        if (!arPlaceholder) return;
-        arPlaceholder.innerHTML = `
-            <div class="ar-active">
-                <i class="fas fa-video"></i>
-                <h3>AR Session Active</h3>
-                <p>Point camera at vehicle component</p>
-                <button class="ar-stop-btn" onclick="stopARSession()">
-                    <i class="fas fa-stop"></i>
-                    Stop Session
-                </button>
-            </div>
-        `;
-
-        showNotification('AR session started successfully', 'success');
-    }, 2000);
+function getARContainer() {
+    return document.getElementById('ar-viewport') || document.querySelector('.ar-placeholder');
 }
 
-function stopARSession() {
-    const arPlaceholder = document.querySelector('.ar-placeholder');
-
-    if (!arPlaceholder) return;
-    arPlaceholder.innerHTML = `
+function renderARPlaceholder(container) {
+    if (!container) return;
+    container.innerHTML = `
         <i class="fas fa-camera"></i>
         <h3>AR Camera View</h3>
         <p>Position camera toward vehicle component</p>
-        <button class="ar-start-btn" onclick="startARSession()">
+        <button type="button" class="action-btn" onclick="toggleAR()" id="ar-toggle">
             <i class="fas fa-play"></i>
             Start AR Session
         </button>
     `;
+}
+
+function renderARActive(container) {
+    if (!container) return;
+    container.innerHTML = `
+        <div class="ar-active">
+            <div class="ar-video-wrap">
+                <video class="ar-video" autoplay playsinline muted></video>
+            </div>
+            <h3>AR Session Active</h3>
+            <p>Point camera at vehicle component</p>
+            <button type="button" class="ar-stop-btn" onclick="toggleAR()" id="ar-toggle">
+                <i class="fas fa-stop"></i>
+                Stop Session
+            </button>
+        </div>
+    `;
+    arVideoEl = container.querySelector('video');
+}
+
+async function startARSession() {
+    const container = getARContainer();
+    const status = document.getElementById('ar-status');
+
+    if (!container) {
+        showNotification('AR UI elements missing', 'warning');
+        return;
+    }
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+        showNotification('Camera access not supported in this browser', 'error');
+        return;
+    }
+
+    showNotification('Requesting camera access...', 'info');
+    renderARActive(container);
+
+    try {
+        arStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: 'environment' } },
+            audio: false
+        });
+
+        if (arVideoEl) {
+            arVideoEl.srcObject = arStream;
+        }
+
+        if (status) {
+            status.textContent = 'Active';
+            status.className = 'status-badge active';
+        }
+
+        if (typeof isARActive !== 'undefined') {
+            isARActive = true;
+        }
+
+        showNotification('AR session started successfully', 'success');
+    } catch (error) {
+        console.error('Camera access error:', error);
+        renderARPlaceholder(container);
+        if (status) {
+            status.textContent = 'Ready';
+            status.className = 'status-badge active';
+        }
+        if (typeof isARActive !== 'undefined') {
+            isARActive = false;
+        }
+        showNotification('Camera access denied or unavailable', 'error');
+    }
+}
+
+function stopARSession() {
+    const container = getARContainer();
+    const status = document.getElementById('ar-status');
+
+    if (arStream) {
+        arStream.getTracks().forEach(track => track.stop());
+        arStream = null;
+    }
+    arVideoEl = null;
+
+    renderARPlaceholder(container);
+
+    if (status) {
+        status.textContent = 'Ready';
+        status.className = 'status-badge active';
+    }
+
+    if (typeof isARActive !== 'undefined') {
+        isARActive = false;
+    }
 
     showNotification('AR session stopped', 'info');
 }
@@ -436,6 +509,23 @@ style.textContent = `
     }
     .notification-content { display: flex; align-items: center; gap: 10px; }
     .ar-active { text-align: center; color: rgba(255, 255, 255, 0.9); }
+    .ar-video-wrap {
+        position: relative;
+        width: 100%;
+        max-width: 720px;
+        margin: 0 auto 16px;
+        aspect-ratio: 16 / 9;
+        background: rgba(0, 0, 0, 0.45);
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .ar-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
     .ar-active i { font-size: 4rem; color: #22c55e; margin-bottom: 16px; animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .ar-stop-btn {
@@ -642,48 +732,15 @@ function refreshData() {
 }
 
 function toggleAR() {
-    const button = document.getElementById('ar-toggle');
-    const status = document.getElementById('ar-status');
-    const viewport = document.getElementById('ar-viewport');
-
-    if (!button || !status || !viewport) {
-        showNotification('AR UI elements missing', 'warning');
+    if (typeof isARActive === 'undefined') {
+        startARSession();
         return;
     }
 
     if (!isARActive) {
-        showNotification('Initializing AR camera...', 'info');
-        button.innerHTML = '⏸️ Stop AR Session';
-        status.innerHTML = 'Active';
-        status.className = 'status-badge active';
-
-        setTimeout(() => {
-            viewport.innerHTML = `
-                <h3>📹 AR Session Active</h3>
-                <p>Camera overlay enabled - Point at vehicle component</p>
-                <button type="button" class="action-btn" onclick="toggleAR()" id="ar-toggle">
-                    ⏸️ Stop AR Session
-                </button>
-            `;
-            showNotification('AR session started successfully!', 'success');
-        }, 1200);
-
-        isARActive = true;
+        startARSession();
     } else {
-        showNotification('Stopping AR session...', 'info');
-        button.innerHTML = '▶️ Start AR Session';
-        status.innerHTML = 'Ready';
-
-        viewport.innerHTML = `
-            <h3>📷 AR Camera View</h3>
-            <p>Position camera toward vehicle component</p>
-            <button type="button" class="action-btn" onclick="toggleAR()" id="ar-toggle">
-                ▶️ Start AR Session
-            </button>
-        `;
-
-        showNotification('AR session stopped', 'info');
-        isARActive = false;
+        stopARSession();
     }
 }
 
