@@ -13,6 +13,13 @@ module.exports = [
       sourceType: "module",
       globals: {
         console: "readonly",
+        window: "readonly",
+        document: "readonly",
+        localStorage: "readonly",
+        fetch: "readonly",
+        URL: "readonly",
+        Blob: "readonly",
+        setTimeout: "readonly",
       },
     },
     plugins: {
@@ -23,7 +30,7 @@ module.exports = [
     },
   },
   {
-    files: ["backend/**/*.js"],
+    files: ["backend/**/*.js", "data/**/*.js"],
     languageOptions: {
       ecmaVersion: 2021,
       sourceType: "module",
