@@ -16,4 +16,17 @@ module.exports = [
       "prettier/prettier": "error",
     },
   },
+  {
+    files: ["backend/**/*.js"],
+    languageOptions: {
+      ecmaVersion: 2021,
+      sourceType: "module",
+      globals: {
+        process: "readonly",
+        __dirname: "readonly",
+        module: "readonly",
+        require: "readonly",
+      },
+    },
+  },
 ];

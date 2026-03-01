@@ -12,24 +12,32 @@ const DEFAULT_COMPLIANCE = {
   rate: "99.2%",
   lastAudit: "2026-02-20",
   openFindings: 0,
-  nextReview: "2026-03-20"
+  nextReview: "2026-03-20",
 };
 
 function getComplianceStatus() {
   const row = db
-    .prepare("SELECT rate, last_audit, open_findings, next_review FROM compliance_status WHERE id = ?")
+    .prepare(
+      "SELECT rate, last_audit, open_findings, next_review FROM compliance_status WHERE id = ?"
+    )
     .get("default");
   if (row) {
     return {
       rate: row.rate,
       lastAudit: row.last_audit,
       openFindings: row.open_findings,
-      nextReview: row.next_review
+      nextReview: row.next_review,
     };
   }
   db.prepare(
     "INSERT INTO compliance_status (id, rate, last_audit, open_findings, next_review) VALUES (?, ?, ?, ?, ?)"
-  ).run("default", DEFAULT_COMPLIANCE.rate, DEFAULT_COMPLIANCE.lastAudit, DEFAULT_COMPLIANCE.openFindings, DEFAULT_COMPLIANCE.nextReview);
+  ).run(
+    "default",
+    DEFAULT_COMPLIANCE.rate,
+    DEFAULT_COMPLIANCE.lastAudit,
+    DEFAULT_COMPLIANCE.openFindings,
+    DEFAULT_COMPLIANCE.nextReview
+  );
   return { ...DEFAULT_COMPLIANCE };
 }
 
@@ -42,7 +50,9 @@ app.get("/health", (req, res) => {
 });
 
 app.get("/api/v1/users", (req, res) => {
-  const rows = db.prepare("SELECT id, email, name, created_at FROM users ORDER BY created_at DESC").all();
+  const rows = db
+    .prepare("SELECT id, email, name, created_at FROM users ORDER BY created_at DESC")
+    .all();
   res.json({ data: rows });
 });
 
@@ -58,7 +68,9 @@ app.post("/api/v1/users", (req, res) => {
 });
 
 app.get("/api/v1/shops", (req, res) => {
-  const rows = db.prepare("SELECT id, name, owner_user_id, created_at FROM shops ORDER BY created_at DESC").all();
+  const rows = db
+    .prepare("SELECT id, name, owner_user_id, created_at FROM shops ORDER BY created_at DESC")
+    .all();
   res.json({ data: rows });
 });
 
@@ -68,7 +80,11 @@ app.post("/api/v1/shops", (req, res) => {
     return res.status(400).json({ error: "name is required" });
   }
   const id = crypto.randomUUID();
-  db.prepare("INSERT INTO shops (id, name, owner_user_id) VALUES (?, ?, ?)").run(id, name, ownerUserId || null);
+  db.prepare("INSERT INTO shops (id, name, owner_user_id) VALUES (?, ?, ?)").run(
+    id,
+    name,
+    ownerUserId || null
+  );
   res.status(201).json({ data: { id, name, ownerUserId: ownerUserId || null } });
 });
 
@@ -77,10 +93,16 @@ app.get("/api/v1/vin-lookups", (req, res) => {
   let rows = [];
   if (vin) {
     rows = db
-      .prepare("SELECT id, vin, source, payload_json, created_at FROM vin_lookups WHERE vin = ? ORDER BY created_at DESC")
+      .prepare(
+        "SELECT id, vin, source, payload_json, created_at FROM vin_lookups WHERE vin = ? ORDER BY created_at DESC"
+      )
       .all(String(vin));
   } else {
-    rows = db.prepare("SELECT id, vin, source, payload_json, created_at FROM vin_lookups ORDER BY created_at DESC").all();
+    rows = db
+      .prepare(
+        "SELECT id, vin, source, payload_json, created_at FROM vin_lookups ORDER BY created_at DESC"
+      )
+      .all();
   }
   res.json({ data: rows });
 });
@@ -101,7 +123,9 @@ app.post("/api/v1/vin-lookups", (req, res) => {
 });
 
 app.get("/api/v1/reports", (req, res) => {
-  const rows = db.prepare("SELECT id, vin_lookup_id, summary, created_at FROM reports ORDER BY created_at DESC").all();
+  const rows = db
+    .prepare("SELECT id, vin_lookup_id, summary, created_at FROM reports ORDER BY created_at DESC")
+    .all();
   res.json({ data: rows });
 });
 
@@ -126,25 +150,33 @@ app.get("/api/v1/compliance", (req, res) => {
 app.post("/api/v1/compliance", (req, res) => {
   const { rate, lastAudit, openFindings, nextReview } = req.body || {};
   if (!rate || !lastAudit || openFindings === undefined || !nextReview) {
-    return res.status(400).json({ error: "rate, lastAudit, openFindings, and nextReview are required" });
+    return res
+      .status(400)
+      .json({ error: "rate, lastAudit, openFindings, and nextReview are required" });
   }
   db.prepare(
     "INSERT INTO compliance_status (id, rate, last_audit, open_findings, next_review, updated_at) VALUES (?, ?, ?, ?, ?, datetime('now')) " +
       "ON CONFLICT(id) DO UPDATE SET rate=excluded.rate, last_audit=excluded.last_audit, open_findings=excluded.open_findings, next_review=excluded.next_review, updated_at=datetime('now')"
   ).run("default", rate, lastAudit, Number(openFindings), nextReview);
-  res.status(200).json({ data: { rate, lastAudit, openFindings: Number(openFindings), nextReview } });
+  res
+    .status(200)
+    .json({ data: { rate, lastAudit, openFindings: Number(openFindings), nextReview } });
 });
 
 app.post("/api/v1/compliance/reports", (req, res) => {
   const { summary, payload } = req.body || {};
   const id = crypto.randomUUID();
-  db.prepare("INSERT INTO compliance_reports (id, status, summary, payload_json) VALUES (?, ?, ?, ?)").run(
+  db.prepare(
+    "INSERT INTO compliance_reports (id, status, summary, payload_json) VALUES (?, ?, ?, ?)"
+  ).run(
     id,
     "generated",
     summary || "Compliance report generated",
     payload ? JSON.stringify(payload) : null
   );
-  res.status(201).json({ data: { id, status: "generated", summary: summary || "Compliance report generated" } });
+  res
+    .status(201)
+    .json({ data: { id, status: "generated", summary: summary || "Compliance report generated" } });
 });
 
 app.use((err, req, res, next) => {
