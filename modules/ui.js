@@ -2,6 +2,129 @@
  * UI + Interaction Handlers
  */
 
+const CART_STORAGE_KEY = 'repairbridge_cart';
+
+function getCartState() {
+    if (typeof RepairBridgeState !== 'undefined') {
+        return RepairBridgeState.getState().cart || [];
+    }
+    return [];
+}
+
+function setCartState(nextCart) {
+    if (typeof RepairBridgeState !== 'undefined') {
+        RepairBridgeState.setState({ cart: nextCart });
+    }
+}
+
+function getIsARActive() {
+    if (typeof RepairBridgeState !== 'undefined') {
+        return Boolean(RepairBridgeState.getState().isARActive);
+    }
+    return false;
+}
+
+function setIsARActive(nextValue) {
+    if (typeof RepairBridgeState !== 'undefined') {
+        RepairBridgeState.setState({ isARActive: Boolean(nextValue) });
+    }
+}
+
+function parsePriceValue(price) {
+    const numeric = parseFloat(String(price).replace(/[^0-9.]/g, ''));
+    return Number.isFinite(numeric) ? numeric : 0;
+}
+
+function formatCurrency(value) {
+    const normalized = Number.isFinite(value) ? value : 0;
+    return `$${normalized.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+}
+
+function loadCartFromStorage() {
+    try {
+        const saved = localStorage.getItem(CART_STORAGE_KEY);
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed)) {
+                setCartState(parsed);
+            }
+        }
+    } catch (error) {
+        console.warn('Unable to load cart from storage', error);
+    }
+}
+
+function saveCartToStorage() {
+    try {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(getCartState()));
+    } catch (error) {
+        console.warn('Unable to save cart to storage', error);
+    }
+}
+
+function getCartCount() {
+    return getCartState().reduce((sum, item) => sum + (item.quantity || 0), 0);
+}
+
+function renderCart() {
+    const cartState = getCartState();
+    const cartItemsEl = document.getElementById('cart-items');
+    const cartTotalEl = document.getElementById('cart-total');
+    const cartCounterEl = document.getElementById('cart-counter');
+
+    if (!cartItemsEl || !cartTotalEl || !cartCounterEl) return;
+
+    const count = getCartCount();
+    cartCounterEl.textContent = count;
+
+    if (!cartState.length) {
+        cartItemsEl.innerHTML = '<p class="empty-cart">Your cart is empty.</p>';
+        cartTotalEl.textContent = 'Total: $0';
+        return;
+    }
+
+    cartItemsEl.innerHTML = cartState.map(item => {
+        const price = formatCurrency(item.price || 0);
+        return `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <span class="cart-item-title">${item.name}</span>
+                    <span class="cart-item-meta">${price} · Qty ${item.quantity}</span>
+                </div>
+                <div class="cart-item-actions">
+                    <button type="button" data-action="decrease" data-item="${item.name}">-</button>
+                    <button type="button" data-action="increase" data-item="${item.name}">+</button>
+                    <button type="button" data-action="remove" data-item="${item.name}">Remove</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    const total = cartState.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 0), 0);
+    cartTotalEl.textContent = `Total: ${formatCurrency(total)}`;
+}
+
+function adjustCartItem(itemName, delta) {
+    const cartState = getCartState().map(item => ({ ...item }));
+    const item = cartState.find(entry => entry.name === itemName);
+    if (!item) return;
+
+    item.quantity = (item.quantity || 0) + delta;
+    const nextCart = item.quantity <= 0
+        ? cartState.filter(entry => entry.name !== itemName)
+        : cartState;
+
+    setCartState(nextCart);
+    saveCartToStorage();
+    renderCart();
+}
+
+function clearCart() {
+    setCartState([]);
+    saveCartToStorage();
+    renderCart();
+}
+
 /**
  * Navigation System
  * Handles section switching and active state management
@@ -124,6 +247,36 @@ function initializeMarketplace() {
             addToCart(itemName, itemPrice);
         });
     });
+
+    const clearButton = document.getElementById('clear-cart-btn');
+    if (clearButton) {
+        clearButton.addEventListener('click', () => {
+            clearCart();
+            showNotification('Cart cleared', 'info');
+        });
+    }
+
+    const cartItemsEl = document.getElementById('cart-items');
+    if (cartItemsEl) {
+        cartItemsEl.addEventListener('click', event => {
+            const target = event.target;
+            if (!(target instanceof HTMLElement)) return;
+            const action = target.dataset.action;
+            const itemName = target.dataset.item;
+            if (!action || !itemName) return;
+
+            if (action === 'increase') {
+                adjustCartItem(itemName, 1);
+            } else if (action === 'decrease') {
+                adjustCartItem(itemName, -1);
+            } else if (action === 'remove') {
+                adjustCartItem(itemName, -999);
+            }
+        });
+    }
+
+    loadCartFromStorage();
+    renderCart();
 }
 
 /**
@@ -294,9 +447,7 @@ async function startARSession() {
             status.className = 'status-badge active';
         }
 
-        if (typeof isARActive !== 'undefined') {
-            isARActive = true;
-        }
+        setIsARActive(true);
 
         showNotification('AR session started successfully', 'success');
     } catch (error) {
@@ -306,9 +457,7 @@ async function startARSession() {
             status.textContent = 'Ready';
             status.className = 'status-badge active';
         }
-        if (typeof isARActive !== 'undefined') {
-            isARActive = false;
-        }
+        setIsARActive(false);
         showNotification('Camera access denied or unavailable', 'error');
     }
 }
@@ -330,9 +479,7 @@ function stopARSession() {
         status.className = 'status-badge active';
     }
 
-    if (typeof isARActive !== 'undefined') {
-        isARActive = false;
-    }
+    setIsARActive(false);
 
     showNotification('AR session stopped', 'info');
 }
@@ -356,13 +503,24 @@ function filterMarketplaceItems(category) {
 }
 
 function addToCart(itemName, itemPrice) {
-    showNotification(`Added ${itemName} to cart (${itemPrice})`, 'success');
+    const priceValue = parsePriceValue(itemPrice);
+    const cartState = getCartState().map(item => ({ ...item }));
+    const existing = cartState.find(item => item.name === itemName);
 
-    const cartCounter = document.querySelector('.cart-counter');
-    if (cartCounter) {
-        const currentCount = parseInt(cartCounter.textContent) || 0;
-        cartCounter.textContent = currentCount + 1;
+    if (existing) {
+        existing.quantity += 1;
+    } else {
+        cartState.push({
+            name: itemName,
+            price: priceValue,
+            quantity: 1
+        });
     }
+
+    setCartState(cartState);
+    saveCartToStorage();
+    renderCart();
+    showNotification(`Added ${itemName} to cart (${formatCurrency(priceValue)})`, 'success');
 }
 
 function launchComplianceTool(toolName) {
@@ -732,12 +890,8 @@ function refreshData() {
 }
 
 function toggleAR() {
-    if (typeof isARActive === 'undefined') {
-        startARSession();
-        return;
-    }
-
-    if (!isARActive) {
+    const isActive = getIsARActive();
+    if (!isActive) {
         startARSession();
     } else {
         stopARSession();

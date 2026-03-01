@@ -2,8 +2,15 @@
  * Reports + Exports
  */
 
+function getLastVinReport() {
+    if (typeof RepairBridgeState !== 'undefined') {
+        return RepairBridgeState.getState().lastVinReport;
+    }
+    return null;
+}
+
 function downloadVinReport() {
-    const payload = window._rb_lastVinReport;
+    const payload = getLastVinReport();
     if (!payload) {
         showNotification('Run a VIN search first', 'warning');
         return;
@@ -29,7 +36,7 @@ function downloadVinReport() {
         lines.push('TSBs: unavailable (no free public endpoint)');
     }
 
-    const fallbackList = window._rb_lastVinReport?.tsbFallbacks || [];
+    const fallbackList = payload?.tsbFallbacks || [];
     if (fallbackList.length) {
         lines.push('');
         lines.push(`Manual TSBs (${fallbackList.length}):`);
@@ -92,7 +99,7 @@ function buildVinReportCsvLines(payload) {
 }
 
 function downloadVinReportCSV() {
-    const payload = window._rb_lastVinReport;
+    const payload = getLastVinReport();
     if (!payload) {
         showNotification('Run a VIN search first', 'warning');
         return;
@@ -109,7 +116,7 @@ function downloadVinReportCSV() {
 }
 
 function downloadVinReportPDF() {
-    const payload = window._rb_lastVinReport;
+    const payload = getLastVinReport();
     if (!payload) {
         showNotification('Run a VIN search first', 'warning');
         return;
@@ -120,7 +127,7 @@ function downloadVinReportPDF() {
         ? tsbs.map(t => `<li>${t.Component || 'TSB'}: ${t.Summary || 'Details available'}</li>`).join('')
         : '<li>TSB data unavailable (no free public endpoint)</li>';
 
-    const fallbackList = window._rb_lastVinReport?.tsbFallbacks || [];
+    const fallbackList = payload?.tsbFallbacks || [];
     const fallbackItems = fallbackList.length
         ? fallbackList.map(item => {
             const detail = [item.link, item.fileName].filter(Boolean).join(' | ') || 'Manual TSB attached';
@@ -247,6 +254,7 @@ function parseVinReportCsv(text) {
 }
 
 function saveReportToHistory(vinData, recallCount, complaintCount, tsbCount) {
+    const lastReport = getLastVinReport();
     const report = {
         vin: vinData.vin,
         title: `${vinData.year} ${vinData.make} ${vinData.model}`,
@@ -264,26 +272,26 @@ function saveReportToHistory(vinData, recallCount, complaintCount, tsbCount) {
                 body: vinData.body,
                 engine: vinData.engine
             },
-            recalls: Array.isArray(window._rb_lastVinReport?.recalls)
-                ? window._rb_lastVinReport.recalls.map(item => ({
+            recalls: Array.isArray(lastReport?.recalls)
+                ? lastReport.recalls.map(item => ({
                     component: item.Component || 'Recall',
                     summary: item.Summary || 'Details available'
                 }))
                 : [],
-            complaints: Array.isArray(window._rb_lastVinReport?.complaints)
-                ? window._rb_lastVinReport.complaints.map(item => ({
+            complaints: Array.isArray(lastReport?.complaints)
+                ? lastReport.complaints.map(item => ({
                     component: item.Component || 'Complaint',
                     summary: item.Summary || 'Details available'
                 }))
                 : [],
-            tsbs: Array.isArray(window._rb_lastVinReport?.tsbs)
-                ? window._rb_lastVinReport.tsbs.map(item => ({
+            tsbs: Array.isArray(lastReport?.tsbs)
+                ? lastReport.tsbs.map(item => ({
                     component: item.Component || 'TSB',
                     summary: item.Summary || 'Details available'
                 }))
                 : null,
-            tsbFallbacks: Array.isArray(window._rb_lastVinReport?.tsbFallbacks)
-                ? window._rb_lastVinReport.tsbFallbacks.map(item => ({
+            tsbFallbacks: Array.isArray(lastReport?.tsbFallbacks)
+                ? lastReport.tsbFallbacks.map(item => ({
                     link: item.link || null,
                     fileName: item.fileName || null,
                     fileDataUrl: item.fileDataUrl || null,
@@ -487,10 +495,23 @@ function exportTransactionLog() {
 /**
  * Generates compliance report
  */
-function generateComplianceReport() {
-    setTimeout(() => {
+async function generateComplianceReport() {
+    const baseUrl = typeof RepairBridgeConfig !== 'undefined' && RepairBridgeConfig.getEndpoint
+        ? RepairBridgeConfig.getEndpoint('backendBase')
+        : (window.REPAIRBRIDGE_BACKEND_URL || 'http://localhost:5050');
+
+    try {
+        const res = await fetch(`${baseUrl}/api/v1/compliance/reports`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ summary: 'Compliance report generated' })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         showNotification('Compliance report generated successfully', 'success');
-    }, 3000);
+    } catch (error) {
+        console.warn('Compliance report generation failed:', error);
+        showNotification('Compliance report service unavailable', 'warning');
+    }
 }
 
 // expose for inline onclick

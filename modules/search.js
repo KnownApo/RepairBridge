@@ -3,6 +3,19 @@
  * Handles vehicle data search and filtering
  */
 
+function getLastVinReport() {
+    if (typeof RepairBridgeState !== 'undefined') {
+        return RepairBridgeState.getState().lastVinReport;
+    }
+    return null;
+}
+
+function setLastVinReport(report) {
+    if (typeof RepairBridgeState !== 'undefined') {
+        RepairBridgeState.setState({ lastVinReport: report });
+    }
+}
+
 function initializeSearch() {
     const searchButton = document.querySelector('.search-btn') || document.getElementById('search-btn');
     const searchInput = document.querySelector('.search-input') || document.getElementById('vehicle-search');
@@ -103,72 +116,63 @@ async function performVehicleSearch(query, make) {
             return;
         }
 
-        // Fallback to demo results for non-VIN searches
-        const results = generateMockSearchResults(query, make);
+        const results = await fetchVehicleMatches(query, make);
         displaySearchResults(results);
-        showNotification(`Found ${results.length} matching vehicles`, 'success');
+        if (!results.length) {
+            showNotification('No matching vehicles found.', 'warning');
+        } else {
+            showNotification(`Found ${results.length} matching vehicles`, 'success');
+        }
     } finally {
         setSearchLoading(false);
     }
 }
 
-/**
- * Generates mock search results
- * @param {string} query - Search query
- * @param {string} make - Vehicle make
- * @returns {Array} Mock search results
- */
-function generateMockSearchResults(query, make) {
-    const mockResults = [
-        {
-            vin: query.length > 10 ? query : '1FTFW1E50NFB12345',
-            make: make === 'All Makes' ? 'Ford' : make,
-            model: 'F-150',
-            year: '2023',
-            lastService: '2024-12-15',
-            status: 'Active'
-        },
-        {
-            vin: '2FMDK3GC4MBA12345',
-            make: make === 'All Makes' ? 'Ford' : make,
-            model: 'Edge',
-            year: '2022',
-            lastService: '2024-11-28',
-            status: 'Active'
-        },
-        {
-            vin: '3FA6P0HD8JR123456',
-            make: make === 'All Makes' ? 'Ford' : make,
-            model: 'Fusion',
-            year: '2021',
-            lastService: '2024-10-05',
-            status: 'Maintenance Due'
-        }
-    ];
-
-    return mockResults;
+async function fetchMakeMatches(query) {
+    if (!window.RepairBridgeDataAdapters) return [];
+    return RepairBridgeDataAdapters.getMakes({ query });
 }
 
-function buildVinDecodeUrl(vin) {
-    const base = RepairBridgeConfig.getEndpoint('vinDecodeBase');
-    const sanitized = String(vin).replace(/^\/+|\/+$/g, '');
-    const cleanedBase = String(base || '').replace(/\/+$/g, '');
-    return `${cleanedBase}/${encodeURIComponent(sanitized)}?format=json`;
+async function fetchModelsForMake(make) {
+    if (!window.RepairBridgeDataAdapters) return [];
+    return RepairBridgeDataAdapters.getModelsForMake(make);
 }
 
-function buildVehicleQueryUrl(endpointName, make, model, year) {
-    const base = RepairBridgeConfig.getEndpoint(endpointName);
-    try {
-        const url = new URL(base);
-        url.searchParams.set('make', make);
-        url.searchParams.set('model', model);
-        url.searchParams.set('modelYear', year);
-        return url.toString();
-    } catch (err) {
-        const params = `make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&modelYear=${encodeURIComponent(year)}`;
-        const joiner = String(base).includes('?') ? '&' : '?';
-        return `${base}${joiner}${params}`;
+async function fetchVehicleMatches(query, make) {
+    const q = query.trim();
+    if (!q) return [];
+
+    let resolvedMake = make;
+    let models = [];
+
+    if (!resolvedMake || resolvedMake === 'All Makes') {
+        const makeMatches = await fetchMakeMatches(q);
+        if (!makeMatches.length) return [];
+        const exact = makeMatches.find(item => item.Make_Name && item.Make_Name.toLowerCase() === q.toLowerCase());
+        resolvedMake = exact?.Make_Name || makeMatches[0].Make_Name;
+        models = await fetchModelsForMake(resolvedMake);
+    } else {
+        models = await fetchModelsForMake(resolvedMake);
     }
+
+    const filteredModels = models.filter(item => {
+        if (!q) return true;
+        const modelName = item.Model_Name || '';
+        return modelName.toLowerCase().includes(q.toLowerCase()) || resolvedMake.toLowerCase().includes(q.toLowerCase());
+    });
+
+    const results = (filteredModels.length ? filteredModels : models)
+        .slice(0, 8)
+        .map(item => ({
+            vin: '—',
+            make: resolvedMake,
+            model: item.Model_Name || 'Model',
+            year: '—',
+            lastService: '—',
+            status: 'Reference'
+        }));
+
+    return results;
 }
 
 /**
@@ -182,15 +186,22 @@ function displaySearchResults(results) {
     let html = '<h4 style="color: white; margin-bottom: 16px;">Search Results:</h4>';
 
     results.forEach(result => {
+        const year = result.year && result.year !== 'Unknown' ? result.year : '—';
+        const make = result.make || 'Unknown';
+        const model = result.model || '—';
+        const title = `${year} ${make} ${model}`.replace(/\s+/g, ' ').trim();
+        const vin = result.vin || '—';
+        const lastService = result.lastService || '—';
+        const status = result.status || 'Unknown';
         html += `
             <div class="result-item">
                 <div class="result-info">
-                    <h4>${result.year} ${result.make} ${result.model}</h4>
-                    <p>VIN: ${result.vin}</p>
-                    <p>Last Service: ${result.lastService}</p>
+                    <h4>${title}</h4>
+                    <p>VIN: ${vin}</p>
+                    <p>Last Service: ${lastService}</p>
                 </div>
-                <div class="result-status ${result.status.toLowerCase().replace(' ', '-')}">
-                    ${result.status}
+                <div class="result-status ${status.toLowerCase().replace(' ', '-')}">
+                    ${status}
                 </div>
             </div>
         `;
@@ -201,18 +212,13 @@ function displaySearchResults(results) {
 
 
 async function fetchVinData(vin) {
+    if (!window.RepairBridgeDataAdapters) {
+        showNotification('Vehicle data adapters not loaded.', 'warning');
+        return { vin, make: 'Unknown', model: 'Unknown', year: 'Unknown', trim: '—', body: '—', engine: '—' };
+    }
+
     try {
-        const data = await RepairBridgeAPI.getJson(buildVinDecodeUrl(vin));
-        const row = data?.Results?.[0] || {};
-        return {
-            vin,
-            make: row.Make || 'Unknown',
-            model: row.Model || 'Unknown',
-            year: row.ModelYear || 'Unknown',
-            trim: row.Trim || row.Series || '—',
-            body: row.BodyClass || '—',
-            engine: row.EngineModel || row.EngineCylinders || '—'
-        };
+        return await RepairBridgeDataAdapters.decodeVin(vin);
     } catch (err) {
         console.warn('VIN decode failed', err);
         showNotification('VIN lookup failed. Please try again.', 'error');
@@ -222,11 +228,9 @@ async function fetchVinData(vin) {
 
 async function fetchRecalls(vinData) {
     if (!vinData || vinData.make === 'Unknown') return [];
-    const { make, model, year } = vinData;
+    if (!window.RepairBridgeDataAdapters) return [];
     try {
-        const url = buildVehicleQueryUrl('recallsBase', make, model, year);
-        const data = await RepairBridgeAPI.getJson(url);
-        return data?.results || [];
+        return await RepairBridgeDataAdapters.getRecalls(vinData);
     } catch (err) {
         console.warn('Recall fetch failed', err);
         showNotification('Recall data unavailable.', 'warning');
@@ -236,11 +240,9 @@ async function fetchRecalls(vinData) {
 
 async function fetchComplaints(vinData) {
     if (!vinData || vinData.make === 'Unknown') return [];
-    const { make, model, year } = vinData;
+    if (!window.RepairBridgeDataAdapters) return [];
     try {
-        const url = buildVehicleQueryUrl('complaintsBase', make, model, year);
-        const data = await RepairBridgeAPI.getJson(url);
-        return data?.results || [];
+        return await RepairBridgeDataAdapters.getComplaints(vinData);
     } catch (err) {
         console.warn('Complaints fetch failed', err);
         showNotification('Complaint data unavailable.', 'warning');
@@ -250,11 +252,9 @@ async function fetchComplaints(vinData) {
 
 async function fetchTsbs(vinData) {
     if (!vinData || vinData.make === 'Unknown') return null;
-    const { make, model, year } = vinData;
+    if (!window.RepairBridgeDataAdapters) return null;
     try {
-        const url = buildVehicleQueryUrl('tsbsBase', make, model, year);
-        const data = await RepairBridgeAPI.getJson(url);
-        return data?.results || [];
+        return await RepairBridgeDataAdapters.getTsbs(vinData);
     } catch (err) {
         console.warn('TSB fetch failed', err);
         showNotification('TSB data unavailable.', 'warning');
@@ -332,7 +332,7 @@ function displayVinResults(vinData, recalls, complaints, tsbs) {
         <button type="button" class="action-btn" style="margin-top:10px;" onclick="downloadVinReportPDF()">⬇️ Download VIN Report (.pdf)</button>
     `;
 
-    window._rb_lastVinReport = { vinData, recalls, complaints, tsbs, tsbFallbacks: [] };
+    setLastVinReport({ vinData, recalls, complaints, tsbs, tsbFallbacks: [] });
     renderTsbFallbackList();
     saveSearchHistory(vinData, recallCount, complaintCount, tsbCount);
     loadLaborEstimatePanel(vinData);
@@ -437,7 +437,7 @@ function renderSearchHistory() {
 function renderTsbFallbackList() {
     const listEl = document.getElementById('tsb-fallback-list');
     if (!listEl) return;
-    const items = window._rb_lastVinReport?.tsbFallbacks || [];
+    const items = getLastVinReport()?.tsbFallbacks || [];
     if (!items.length) {
         listEl.innerHTML = '<li class="report-empty">No manual TSBs added yet</li>';
         return;
@@ -453,7 +453,7 @@ function renderTsbFallbackList() {
 }
 
 function saveTsbFallback() {
-    if (!window._rb_lastVinReport) {
+    if (!getLastVinReport()) {
         showNotification('Run a VIN search first', 'warning');
         return;
     }
@@ -476,9 +476,12 @@ function saveTsbFallback() {
     };
 
     const finalizeSave = () => {
-        const list = window._rb_lastVinReport.tsbFallbacks || [];
+        const report = getLastVinReport();
+        if (!report) return;
+        const list = report.tsbFallbacks || [];
         list.unshift(fallback);
-        window._rb_lastVinReport.tsbFallbacks = list.slice(0, 5);
+        const nextReport = { ...report, tsbFallbacks: list.slice(0, 5) };
+        setLastVinReport(nextReport);
         renderTsbFallbackList();
         if (linkEl) linkEl.value = '';
         if (fileEl) fileEl.value = '';

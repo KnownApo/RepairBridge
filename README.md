@@ -80,6 +80,20 @@ RepairBridge is a modern web application that provides independent auto repair s
 
 **Note:** older prototype pages are kept under `/prototypes`.
 
+### Backend (API skeleton)
+
+A lightweight Express + SQLite backend lives in `backend/` for future integration.
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+- Health check: `GET http://localhost:5050/health`
+- Example endpoints: `/api/v1/users`, `/api/v1/shops`, `/api/v1/vin-lookups`, `/api/v1/reports`
+- Configure `PORT` or `CORS_ORIGIN` via `.env` (see `.env.example`).
+
 ## 📜 Policies (Draft)
 - [Privacy Policy](PRIVACY.md)
 - [Terms of Service](TERMS.md)
@@ -136,7 +150,8 @@ RepairBridge/
 
 ### Data
 - Demo data lives in `data/repairbridge.json`
-- Update stats, sources, marketplace items, inventory, analytics, and compliance values there
+- Update stats, sources, marketplace items, inventory, analytics, and account values there
+- Compliance/security data is served from the backend (`/api/v1/compliance`).
 
 ### Styling
 - Colors can be modified in the CSS custom properties
@@ -165,6 +180,42 @@ RepairBridge/
   })
   ```
 - Reset to defaults with `RepairBridgeConfig.resetEndpoints()`
+
+## 🔌 API Usage & Rate Limits
+
+RepairBridge ships with a lightweight API wrapper (`modules/api.js`) that adds in-memory caching and client-side rate limiting.
+
+**Core methods**
+- `RepairBridgeAPI.getJson(url, options)`
+- `RepairBridgeAPI.getText(url, options)`
+
+**Options**
+- `ttlMs` (default `300000`): cache time-to-live in ms (set `0` to disable caching)
+- `cacheKey`: override cache key (defaults to the URL)
+- `fetchOptions`: passed directly to `fetch` (default `{ cache: 'no-store' }`)
+- `rateLimitMs`: per-request min interval override (ms)
+
+**Rate limit defaults**
+- `minIntervalMs: 350` (≈2.8 req/sec)
+- `maxConcurrent: 1`
+
+Update/read the global limiter:
+```js
+RepairBridgeAPI.setRateLimit({ minIntervalMs: 500, maxConcurrent: 2 })
+RepairBridgeAPI.getRateLimit()
+```
+
+**Examples**
+```js
+// Fetch VIN data with 10 min cache
+const data = await RepairBridgeAPI.getJson(url, { ttlMs: 600000 })
+
+// Override per-request rate limit
+await RepairBridgeAPI.getText(url, { rateLimitMs: 1000 })
+
+// Clear cached API responses
+RepairBridgeAPI.clearCache('https://api.nhtsa.gov')
+```
 
 ## 📊 Analytics & Tracking
 
@@ -196,8 +247,8 @@ The earlier competitive feature prototypes (telematics, blockchain verification,
 ## 🐛 Known Issues
 
 - AR functionality is currently simulated (requires camera API integration)
-- Marketplace cart persists only during session
-- Search results are currently mock data
+- Marketplace cart persists across sessions (localStorage)
+- Make/model search results use NHTSA vPIC live data (VIN searches use NHTSA APIs)
 
 ## 📞 Support
 

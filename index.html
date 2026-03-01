@@ -291,6 +291,20 @@
                 <p>Access tools and training with group discounts</p>
             </div>
 
+            <div class="cart-panel" id="cart-panel">
+                <div class="cart-header">
+                    <h3>Cart</h3>
+                    <div class="cart-meta">
+                        <span class="cart-counter" id="cart-counter">0</span>
+                        <button type="button" class="clear-cart-btn" id="clear-cart-btn">Clear</button>
+                    </div>
+                </div>
+                <div class="cart-items" id="cart-items">
+                    <p class="empty-cart">Your cart is empty.</p>
+                </div>
+                <div class="cart-total" id="cart-total">Total: $0</div>
+            </div>
+
             <div class="marketplace-grid" id="marketplace-grid">
                 <div class="marketplace-item">
                     <div class="item-info">
@@ -421,8 +435,10 @@
         ©2025 RepairBridge
     </div>
 
+    <script src="modules/state.js"></script>
     <script src="modules/config.js"></script>
     <script src="modules/api.js"></script>
+    <script src="modules/data-adapters.js"></script>
     <script src="modules/data.js"></script>
     <script src="modules/ui.js"></script>
     <script src="modules/labor-estimates.js"></script>

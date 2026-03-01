@@ -4,6 +4,20 @@
 
 let appData = null;
 
+function getAppData() {
+    if (typeof RepairBridgeState !== 'undefined' && RepairBridgeState.getState) {
+        return RepairBridgeState.getState().appData ?? appData;
+    }
+    return appData;
+}
+
+function setAppData(nextData) {
+    appData = nextData;
+    if (typeof RepairBridgeState !== 'undefined' && RepairBridgeState.setState) {
+        RepairBridgeState.setState({ appData: nextData });
+    }
+}
+
 function renderEmptyState(container, { icon = '📭', title = 'Nothing here yet', body = '' } = {}) {
     if (!container) return;
     container.innerHTML = `
@@ -15,15 +29,27 @@ function renderEmptyState(container, { icon = '📭', title = 'Nothing here yet'
     `;
 }
 
+function getBackendBaseUrl() {
+    if (typeof RepairBridgeConfig !== 'undefined' && RepairBridgeConfig.getEndpoint) {
+        return RepairBridgeConfig.getEndpoint('backendBase');
+    }
+    return window.REPAIRBRIDGE_BACKEND_URL || 'http://localhost:5050';
+}
+
 async function loadAppData() {
     try {
-        appData = await RepairBridgeAPI.getJson('data/repairbridge.json', {
+        const rawData = await RepairBridgeAPI.getJson('data/repairbridge.json', {
             ttlMs: 10 * 60 * 1000,
             cacheKey: 'repairbridge:data'
         });
+        const { compliance, ...baseData } = rawData || {};
+        if (baseData.stats && baseData.stats.compliance) {
+            delete baseData.stats.compliance;
+        }
+        setAppData(baseData);
     } catch (err) {
         console.warn('Falling back to built-in demo data:', err);
-        appData = getFallbackData();
+        setAppData(getFallbackData());
     }
 
     hydrateDashboard();
@@ -34,15 +60,16 @@ async function loadAppData() {
     hydrateCompliance();
     hydrateSettings();
     loadSearchHistory();
+
+    loadComplianceData();
 }
 
 function getFallbackData() {
     return {
-        stats: { vehicles: 150, sources: 10, diagnostics: 4, compliance: '98.7%' },
+        stats: { vehicles: 150, sources: 10, diagnostics: 4 },
         recentActivity: [
             { text: '🔧 Honda Accord diagnostic completed', time: '1 hour ago' },
-            { text: '📥 GM data feed synced', time: '2 hours ago' },
-            { text: '✅ Compliance report generated', time: 'Today' }
+            { text: '📥 GM data feed synced', time: '2 hours ago' }
         ],
         dataSources: [
             { name: 'Ford Motor Company', status: 'connected', lastSync: '8 min ago' },
@@ -53,9 +80,41 @@ function getFallbackData() {
         dataAnalytics: { quota: '80% of monthly quota', speed: '2.4s avg', connections: '3/4 active' },
         marketplace: [],
         inventory: { lowStock: [], suppliers: [] },
-        analytics: { monthlyRevenue: '$38,200', jobsCompleted: 112, avgCycleTime: '2.1 days' },
-        compliance: { lastAudit: '2026-02-01', openFindings: 1, nextReview: '2026-03-01' }
+        analytics: { monthlyRevenue: '$38,200', jobsCompleted: 112, avgCycleTime: '2.1 days' }
     };
+}
+
+async function loadComplianceData({ refresh = false } = {}) {
+    const baseUrl = getBackendBaseUrl();
+    try {
+        const response = await RepairBridgeAPI.getJson(`${baseUrl}/api/v1/compliance`, {
+            ttlMs: refresh ? 0 : 5 * 60 * 1000,
+            cacheKey: 'repairbridge:compliance'
+        });
+        const compliance = response?.data;
+        if (!compliance) return;
+
+        const currentData = getAppData() || {};
+        const nextStats = { ...(currentData.stats || {}) };
+        if (compliance.rate) {
+            nextStats.compliance = compliance.rate;
+        }
+
+        setAppData({
+            ...currentData,
+            stats: nextStats,
+            compliance: {
+                lastAudit: compliance.lastAudit,
+                openFindings: compliance.openFindings,
+                nextReview: compliance.nextReview
+            }
+        });
+
+        hydrateDashboard();
+        hydrateCompliance();
+    } catch (error) {
+        console.warn('Compliance data unavailable:', error);
+    }
 }
 
 function hydrateDashboard() {
@@ -218,9 +277,18 @@ function hydrateAnalytics() {
 }
 
 function hydrateCompliance() {
-    if (!appData || !appData.compliance) return;
+    if (!appData) return;
     const panel = document.getElementById('compliance-panel');
     if (!panel) return;
+
+    if (!appData.compliance) {
+        renderEmptyState(panel, {
+            icon: '🛡️',
+            title: 'Compliance data not loaded',
+            body: 'Compliance status is delivered by the backend service.'
+        });
+        return;
+    }
 
     const hasCompliance = Object.values(appData.compliance || {}).some(value => value !== undefined && value !== null && value !== '');
     if (!hasCompliance) {
@@ -295,4 +363,7 @@ function hydrateSettings() {
 function loadDashboardData() { hydrateDashboard(); }
 function loadDataAggregatorContent() { hydrateDataAggregator(); }
 function loadARDiagnostics() { /* placeholder for future camera binding */ }
-function loadComplianceContent() { hydrateCompliance(); }
+function loadComplianceContent() {
+    loadComplianceData({ refresh: true });
+    hydrateCompliance();
+}
