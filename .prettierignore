@@ -2,3 +2,5 @@ node_modules/
 coverage/
 dist/
 reports/
+prototypes/
+modules/unused/

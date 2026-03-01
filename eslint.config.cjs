@@ -9,7 +9,7 @@ module.exports = [
       "dist/**",
       "reports/**",
       "prototypes/**",
-      "modules/unused/**"
+      "modules/unused/**",
     ],
   },
   js.configs.recommended,

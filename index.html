@@ -1,439 +1,482 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RepairBridge - Fixed Version</title>
-    <link rel="stylesheet" href="styles.css">
-
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     <!-- Main Title -->
     <h1 class="main-title">RepairBridge Platform</h1>
 
     <!-- Main App Container -->
     <div class="app-container">
-        <!-- Navigation Header -->
-        <nav class="nav-header">
-            <div class="nav-brand">
-                <span>🌉 RepairBridge</span>
+      <!-- Navigation Header -->
+      <nav class="nav-header">
+        <div class="nav-brand">
+          <span>🌉 RepairBridge</span>
+        </div>
+        <div class="nav-links">
+          <button type="button" class="nav-btn active" onclick="showSection('dashboard')">
+            Dashboard
+          </button>
+          <button type="button" class="nav-btn" onclick="showSection('data-aggregator')">
+            Data Hub
+          </button>
+          <button type="button" class="nav-btn" onclick="showSection('ar-diagnostics')">
+            AR Diagnostics
+          </button>
+          <button type="button" class="nav-btn" onclick="showSection('marketplace')">
+            Marketplace
+          </button>
+          <button type="button" class="nav-btn" onclick="showSection('inventory')">
+            Inventory
+          </button>
+          <button type="button" class="nav-btn" onclick="showSection('analytics')">
+            Analytics
+          </button>
+          <button type="button" class="nav-btn" onclick="showSection('compliance')">
+            Compliance
+          </button>
+          <button type="button" class="nav-btn" onclick="showSection('settings')">Settings</button>
+        </div>
+      </nav>
+
+      <!-- Dashboard Section -->
+      <section id="dashboard" class="content-section active">
+        <div class="section-header">
+          <h2>📊 Dashboard Overview</h2>
+          <p>Welcome to your RepairBridge command center</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-content">
+              <h3 data-stat="vehicles">156</h3>
+              <p>Vehicles Serviced</p>
             </div>
-            <div class="nav-links">
-                <button type="button" class="nav-btn active" onclick="showSection('dashboard')">Dashboard</button>
-                <button type="button" class="nav-btn" onclick="showSection('data-aggregator')">Data Hub</button>
-                <button type="button" class="nav-btn" onclick="showSection('ar-diagnostics')">AR Diagnostics</button>
-                <button type="button" class="nav-btn" onclick="showSection('marketplace')">Marketplace</button>
-                <button type="button" class="nav-btn" onclick="showSection('inventory')">Inventory</button>
-                <button type="button" class="nav-btn" onclick="showSection('analytics')">Analytics</button>
-                <button type="button" class="nav-btn" onclick="showSection('compliance')">Compliance</button>
-                <button type="button" class="nav-btn" onclick="showSection('settings')">Settings</button>
+          </div>
+          <div class="stat-card">
+            <div class="stat-content">
+              <h3 data-stat="sources">23</h3>
+              <p>Data Sources</p>
             </div>
-        </nav>
-
-        <!-- Dashboard Section -->
-        <section id="dashboard" class="content-section active">
-            <div class="section-header">
-                <h2>📊 Dashboard Overview</h2>
-                <p>Welcome to your RepairBridge command center</p>
+          </div>
+          <div class="stat-card">
+            <div class="stat-content">
+              <h3 data-stat="diagnostics">8</h3>
+              <p>Active Diagnostics</p>
             </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-content">
-                        <h3 data-stat="vehicles">156</h3>
-                        <p>Vehicles Serviced</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-content">
-                        <h3 data-stat="sources">23</h3>
-                        <p>Data Sources</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-content">
-                        <h3 data-stat="diagnostics">8</h3>
-                        <p>Active Diagnostics</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-content">
-                        <h3 data-stat="compliance">100%</h3>
-                        <p>Compliance Rate</p>
-                    </div>
-                </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-content">
+              <h3 data-stat="compliance">100%</h3>
+              <p>Compliance Rate</p>
             </div>
+          </div>
+        </div>
 
-            <div class="dashboard-widgets">
-                <div class="widget">
-                    <h3>Recent Activity</h3>
-                    <div class="activity-list" id="activity-list">
-                        <div class="activity-item">
-                            <span>🔧 BMW X5 diagnostic completed</span>
-                            <small>2 hours ago</small>
-                        </div>
-                        <div class="activity-item">
-                            <span>📥 Ford data feed updated</span>
-                            <small>4 hours ago</small>
-                        </div>
-                        <div class="activity-item">
-                            <span>🏆 New certification available</span>
-                            <small>1 day ago</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="widget">
-                    <h3>Quick Actions</h3>
-                    <div class="quick-actions">
-                        <button type="button" class="action-btn" onclick="quickAction('diagnostic')">
-                            ➕ New Diagnostic
-                        </button>
-                        <button type="button" class="action-btn" onclick="quickAction('sync')">
-                            🔄 Sync Data
-                        </button>
-                        <button type="button" class="action-btn" onclick="quickAction('report')">
-                            📊 Generate Report
-                        </button>
-                    </div>
-                </div>
+        <div class="dashboard-widgets">
+          <div class="widget">
+            <h3>Recent Activity</h3>
+            <div class="activity-list" id="activity-list">
+              <div class="activity-item">
+                <span>🔧 BMW X5 diagnostic completed</span>
+                <small>2 hours ago</small>
+              </div>
+              <div class="activity-item">
+                <span>📥 Ford data feed updated</span>
+                <small>4 hours ago</small>
+              </div>
+              <div class="activity-item">
+                <span>🏆 New certification available</span>
+                <small>1 day ago</small>
+              </div>
             </div>
-        </section>
-
-        <!-- Data Aggregator Section -->
-        <section id="data-aggregator" class="content-section">
-            <div class="section-header">
-                <h2>🗄️ Data Aggregator</h2>
-                <p>Access vehicle data from multiple OEM sources</p>
+          </div>
+          <div class="widget">
+            <h3>Quick Actions</h3>
+            <div class="quick-actions">
+              <button type="button" class="action-btn" onclick="quickAction('diagnostic')">
+                ➕ New Diagnostic
+              </button>
+              <button type="button" class="action-btn" onclick="quickAction('sync')">
+                🔄 Sync Data
+              </button>
+              <button type="button" class="action-btn" onclick="quickAction('report')">
+                📊 Generate Report
+              </button>
             </div>
+          </div>
+        </div>
+      </section>
 
-            <div class="data-sources">
-                <div class="source-card">
-                    <div class="source-header">
-                        <h3>OEM Data Feeds</h3>
-                        <span class="status-badge active">Active</span>
-                    </div>
-                    <div class="source-list" id="oem-source-list">
-                        <div class="source-item">
-                            <span class="connected">🟢</span>
-                            <span>Ford Motor Company</span>
-                            <small>Last sync: 5 min ago</small>
-                        </div>
-                        <div class="source-item">
-                            <span class="connected">🟢</span>
-                            <span>General Motors</span>
-                            <small>Last sync: 12 min ago</small>
-                        </div>
-                        <div class="source-item">
-                            <span class="connected">🟢</span>
-                            <span>Toyota Motors</span>
-                            <small>Last sync: 8 min ago</small>
-                        </div>
-                        <div class="source-item">
-                            <span class="disconnected">🔴</span>
-                            <span>BMW Group</span>
-                            <small>Connection issue</small>
-                        </div>
-                    </div>
-                </div>
+      <!-- Data Aggregator Section -->
+      <section id="data-aggregator" class="content-section">
+        <div class="section-header">
+          <h2>🗄️ Data Aggregator</h2>
+          <p>Access vehicle data from multiple OEM sources</p>
+        </div>
 
-                <div class="source-card">
-                    <div class="source-header">
-                        <h3>Data Analytics</h3>
-                        <button type="button" class="action-btn" onclick="refreshData()">🔄 Refresh</button>
-                    </div>
-                    <div class="loading-placeholder" id="data-analytics-metrics">
-                        <h4>Data Volume: 78% of monthly quota</h4>
-                        <h4>Processing Speed: 2.3s avg</h4>
-                        <h4>Active Connections: 3/4</h4>
-                    </div>
-                </div>
+        <div class="data-sources">
+          <div class="source-card">
+            <div class="source-header">
+              <h3>OEM Data Feeds</h3>
+              <span class="status-badge active">Active</span>
             </div>
-
-            <div class="widget">
-                <h3>Vehicle Data Search</h3>
-                <div class="search-form">
-                    <label class="sr-only" for="vehicle-search">Vehicle VIN</label>
-                    <input type="text" placeholder="Enter VIN (license plates not supported yet)" class="search-input" id="vehicle-search">
-                    <label class="sr-only" for="make-filter">Filter by make</label>
-                    <select class="search-select" id="make-filter">
-                        <option>All Makes</option>
-                        <option>Ford</option>
-                        <option>GM</option>
-                        <option>Toyota</option>
-                        <option>BMW</option>
-                    </select>
-                    <button type="button" class="search-btn" onclick="searchVehicle()">
-                        🔍 Search
-                    </button>
-                </div>
-                <div id="search-results" class="search-results"></div>
-                <div class="widget widget-spaced">
-                    <h4 class="widget-subtitle">Recent VIN Searches</h4>
-                    <div id="search-history" class="activity-list"></div>
-                    <button type="button" class="action-btn btn-spaced" onclick="clearSearchHistory()">🧹 Clear History</button>
-                    <p class="widget-note">Data is provided for informational purposes only. Verify before making repair decisions.</p>
-                </div>
-                <div class="widget widget-spaced">
-                    <h4 class="widget-subtitle">Saved VIN Reports</h4>
-                    <div id="saved-reports" class="activity-list"></div>
-                    <button type="button" class="action-btn btn-spaced" onclick="clearSavedReports()">🗑️ Clear Saved Reports</button>
-                    <p class="widget-note">Saved reports live in this browser only.</p>
-                </div>
+            <div class="source-list" id="oem-source-list">
+              <div class="source-item">
+                <span class="connected">🟢</span>
+                <span>Ford Motor Company</span>
+                <small>Last sync: 5 min ago</small>
+              </div>
+              <div class="source-item">
+                <span class="connected">🟢</span>
+                <span>General Motors</span>
+                <small>Last sync: 12 min ago</small>
+              </div>
+              <div class="source-item">
+                <span class="connected">🟢</span>
+                <span>Toyota Motors</span>
+                <small>Last sync: 8 min ago</small>
+              </div>
+              <div class="source-item">
+                <span class="disconnected">🔴</span>
+                <span>BMW Group</span>
+                <small>Connection issue</small>
+              </div>
             </div>
-        </section>
+          </div>
 
-        <!-- Report View Section -->
-        <section id="report-view" class="content-section">
-            <div class="section-header report-view-header">
-                <h2 id="report-view-title">🧾 VIN Report</h2>
-                <p id="report-view-subtitle">Saved report details</p>
-                <div class="report-view-actions">
-                    <button type="button" class="action-btn" onclick="showSection('data-aggregator')">← Back to Data Hub</button>
-                    <button type="button" class="action-btn" onclick="rerunViewedReport()">🔁 Re-run</button>
-                </div>
+          <div class="source-card">
+            <div class="source-header">
+              <h3>Data Analytics</h3>
+              <button type="button" class="action-btn" onclick="refreshData()">🔄 Refresh</button>
             </div>
-
-            <div class="report-view-grid">
-                <div class="widget">
-                    <h3>Vehicle Info</h3>
-                    <div id="report-view-meta" class="report-meta"></div>
-                </div>
-
-                <div class="widget">
-                    <h3>Recalls</h3>
-                    <ul id="report-view-recalls" class="report-list"></ul>
-                </div>
-
-                <div class="widget">
-                    <h3>Complaints</h3>
-                    <ul id="report-view-complaints" class="report-list"></ul>
-                </div>
-
-                <div class="widget">
-                    <h3>TSBs</h3>
-                    <ul id="report-view-tsbs" class="report-list"></ul>
-                </div>
+            <div class="loading-placeholder" id="data-analytics-metrics">
+              <h4>Data Volume: 78% of monthly quota</h4>
+              <h4>Processing Speed: 2.3s avg</h4>
+              <h4>Active Connections: 3/4</h4>
             </div>
+          </div>
+        </div>
 
-            <div class="widget widget-spaced">
-                <h3>Notes</h3>
-                <p id="report-view-notes" class="widget-note"></p>
-            </div>
-        </section>
+        <div class="widget">
+          <h3>Vehicle Data Search</h3>
+          <div class="search-form">
+            <label class="sr-only" for="vehicle-search">Vehicle VIN</label>
+            <input
+              type="text"
+              placeholder="Enter VIN (license plates not supported yet)"
+              class="search-input"
+              id="vehicle-search"
+            />
+            <label class="sr-only" for="make-filter">Filter by make</label>
+            <select class="search-select" id="make-filter">
+              <option>All Makes</option>
+              <option>Ford</option>
+              <option>GM</option>
+              <option>Toyota</option>
+              <option>BMW</option>
+            </select>
+            <button type="button" class="search-btn" onclick="searchVehicle()">🔍 Search</button>
+          </div>
+          <div id="search-results" class="search-results"></div>
+          <div class="widget widget-spaced">
+            <h4 class="widget-subtitle">Recent VIN Searches</h4>
+            <div id="search-history" class="activity-list"></div>
+            <button type="button" class="action-btn btn-spaced" onclick="clearSearchHistory()">
+              🧹 Clear History
+            </button>
+            <p class="widget-note">
+              Data is provided for informational purposes only. Verify before making repair
+              decisions.
+            </p>
+          </div>
+          <div class="widget widget-spaced">
+            <h4 class="widget-subtitle">Saved VIN Reports</h4>
+            <div id="saved-reports" class="activity-list"></div>
+            <button type="button" class="action-btn btn-spaced" onclick="clearSavedReports()">
+              🗑️ Clear Saved Reports
+            </button>
+            <p class="widget-note">Saved reports live in this browser only.</p>
+          </div>
+        </div>
+      </section>
 
-        <!-- AR Diagnostics Section -->
-        <section id="ar-diagnostics" class="content-section">
-            <div class="section-header">
-                <h2>🔧 AR Diagnostics Assistant</h2>
-                <p>Augmented reality powered vehicle inspections</p>
-            </div>
+      <!-- Report View Section -->
+      <section id="report-view" class="content-section">
+        <div class="section-header report-view-header">
+          <h2 id="report-view-title">🧾 VIN Report</h2>
+          <p id="report-view-subtitle">Saved report details</p>
+          <div class="report-view-actions">
+            <button type="button" class="action-btn" onclick="showSection('data-aggregator')">
+              ← Back to Data Hub
+            </button>
+            <button type="button" class="action-btn" onclick="rerunViewedReport()">
+              🔁 Re-run
+            </button>
+          </div>
+        </div>
 
-            <div class="data-sources">
-                <div class="source-card">
-                    <div class="source-header">
-                        <h3>AR Camera Interface</h3>
-                        <span class="status-badge active" id="ar-status">Ready</span>
-                    </div>
-                    <div class="loading-placeholder" id="ar-viewport">
-                        <h3>📷 AR Camera View</h3>
-                        <p>Position camera toward vehicle component</p>
-                        <button type="button" class="action-btn" onclick="toggleAR()" id="ar-toggle">
-                            ▶️ Start AR Session
-                        </button>
-                    </div>
-                </div>
+        <div class="report-view-grid">
+          <div class="widget">
+            <h3>Vehicle Info</h3>
+            <div id="report-view-meta" class="report-meta"></div>
+          </div>
 
-                <div class="source-card">
-                    <div class="source-header">
-                        <h3>Live Data Stream</h3>
-                        <button type="button" class="action-btn" onclick="updateLiveData()">📊 Refresh Data</button>
-                    </div>
-                    <div class="source-list" id="live-data">
-                        <div class="source-item">
-                            <span>Engine RPM:</span>
-                            <small id="rpm-value">2,450</small>
-                        </div>
-                        <div class="source-item">
-                            <span>Coolant Temp:</span>
-                            <small id="temp-value">195°F</small>
-                        </div>
-                        <div class="source-item">
-                            <span>Oil Pressure:</span>
-                            <small id="pressure-value">45 PSI</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          <div class="widget">
+            <h3>Recalls</h3>
+            <ul id="report-view-recalls" class="report-list"></ul>
+          </div>
 
-            <div class="widget">
-                <h3>Recent Diagnostics</h3>
-                <div class="activity-list">
-                    <div class="activity-item">
-                        <span>🚗 2023 Ford F-150 - VIN: 1FTFW1E50NFB12345</span>
-                        <small>✅ Completed 2h ago</small>
-                    </div>
-                    <div class="activity-item">
-                        <span>🚙 2022 Toyota Camry - VIN: 4T1C11AK5NU123456</span>
-                        <small>🔄 In progress</small>
-                    </div>
-                    <div class="activity-item">
-                        <span>🏎️ 2023 BMW 320i - VIN: WBA3A5C59DF123456</span>
-                        <small>📋 Scheduled</small>
-                    </div>
-                </div>
-            </div>
-        </section>
+          <div class="widget">
+            <h3>Complaints</h3>
+            <ul id="report-view-complaints" class="report-list"></ul>
+          </div>
 
-        <!-- Other sections -->
-        <section id="marketplace" class="content-section">
-            <div class="section-header">
-                <h2>🛒 Tools & Certifications Marketplace</h2>
-                <p>Access tools and training with group discounts</p>
-            </div>
+          <div class="widget">
+            <h3>TSBs</h3>
+            <ul id="report-view-tsbs" class="report-list"></ul>
+          </div>
+        </div>
 
-            <div class="cart-panel" id="cart-panel">
-                <div class="cart-header">
-                    <h3>Cart</h3>
-                    <div class="cart-meta">
-                        <span class="cart-counter" id="cart-counter">0</span>
-                        <button type="button" class="clear-cart-btn" id="clear-cart-btn">Clear</button>
-                    </div>
-                </div>
-                <div class="cart-items" id="cart-items">
-                    <p class="empty-cart">Your cart is empty.</p>
-                </div>
-                <div class="cart-total" id="cart-total">Total: $0</div>
-            </div>
+        <div class="widget widget-spaced">
+          <h3>Notes</h3>
+          <p id="report-view-notes" class="widget-note"></p>
+        </div>
+      </section>
 
-            <div class="marketplace-grid" id="marketplace-grid">
-                <div class="marketplace-item">
-                    <div class="item-info">
-                        <h4>🔍 OBD-II Scanner Pro</h4>
-                        <p>Professional diagnostic scanner with live data streaming</p>
-                        <div class="price-info">
-                            <span class="original-price">$299</span>
-                            <span class="discount-price">$249</span>
-                            <span class="discount-badge">17% OFF</span>
-                        </div>
-                    </div>
-                    <button type="button" class="add-to-cart-btn" onclick="addToCart('OBD-II Scanner Pro', '$249')">
-                        🛒 Add to Cart
-                    </button>
-                </div>
+      <!-- AR Diagnostics Section -->
+      <section id="ar-diagnostics" class="content-section">
+        <div class="section-header">
+          <h2>🔧 AR Diagnostics Assistant</h2>
+          <p>Augmented reality powered vehicle inspections</p>
+        </div>
 
-                <div class="marketplace-item">
-                    <div class="item-info">
-                        <h4>🔬 Leak Detection Kit</h4>
-                        <p>UV dye and detection system for fluid leaks</p>
-                        <div class="price-info">
-                            <span class="original-price">$89</span>
-                            <span class="discount-price">$69</span>
-                            <span class="discount-badge">22% OFF</span>
-                        </div>
-                    </div>
-                    <button type="button" class="add-to-cart-btn" onclick="addToCart('Leak Detection Kit', '$69')">
-                        🛒 Add to Cart
-                    </button>
-                </div>
+        <div class="data-sources">
+          <div class="source-card">
+            <div class="source-header">
+              <h3>AR Camera Interface</h3>
+              <span class="status-badge active" id="ar-status">Ready</span>
+            </div>
+            <div class="loading-placeholder" id="ar-viewport">
+              <h3>📷 AR Camera View</h3>
+              <p>Position camera toward vehicle component</p>
+              <button type="button" class="action-btn" onclick="toggleAR()" id="ar-toggle">
+                ▶️ Start AR Session
+              </button>
+            </div>
+          </div>
 
-                <div class="marketplace-item">
-                    <div class="item-info">
-                        <h4>📚 EV Diagnostics Course</h4>
-                        <p>Comprehensive electric vehicle diagnostic training</p>
-                        <div class="price-info">
-                            <span class="original-price">$499</span>
-                            <span class="discount-price">$399</span>
-                            <span class="discount-badge">20% OFF</span>
-                        </div>
-                    </div>
-                    <button type="button" class="add-to-cart-btn" onclick="addToCart('EV Diagnostics Course', '$399')">
-                        🛒 Add to Cart
-                    </button>
-                </div>
+          <div class="source-card">
+            <div class="source-header">
+              <h3>Live Data Stream</h3>
+              <button type="button" class="action-btn" onclick="updateLiveData()">
+                📊 Refresh Data
+              </button>
+            </div>
+            <div class="source-list" id="live-data">
+              <div class="source-item">
+                <span>Engine RPM:</span>
+                <small id="rpm-value">2,450</small>
+              </div>
+              <div class="source-item">
+                <span>Coolant Temp:</span>
+                <small id="temp-value">195°F</small>
+              </div>
+              <div class="source-item">
+                <span>Oil Pressure:</span>
+                <small id="pressure-value">45 PSI</small>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                <div class="marketplace-item">
-                    <div class="item-info">
-                        <h4>🏆 ASE Certification Prep</h4>
-                        <p>Complete preparation course for ASE certification</p>
-                        <div class="price-info">
-                            <span class="original-price">$199</span>
-                            <span class="discount-price">$149</span>
-                            <span class="discount-badge">25% OFF</span>
-                        </div>
-                    </div>
-                    <button type="button" class="add-to-cart-btn" onclick="addToCart('ASE Certification Prep', '$149')">
-                        🛒 Add to Cart
-                    </button>
-                </div>
+        <div class="widget">
+          <h3>Recent Diagnostics</h3>
+          <div class="activity-list">
+            <div class="activity-item">
+              <span>🚗 2023 Ford F-150 - VIN: 1FTFW1E50NFB12345</span>
+              <small>✅ Completed 2h ago</small>
             </div>
-        </section>
+            <div class="activity-item">
+              <span>🚙 2022 Toyota Camry - VIN: 4T1C11AK5NU123456</span>
+              <small>🔄 In progress</small>
+            </div>
+            <div class="activity-item">
+              <span>🏎️ 2023 BMW 320i - VIN: WBA3A5C59DF123456</span>
+              <small>📋 Scheduled</small>
+            </div>
+          </div>
+        </div>
+      </section>
 
-        <section id="inventory" class="content-section">
-            <div class="section-header">
-                <h2>📦 Inventory</h2>
-                <p>Parts inventory and supplier management</p>
-            </div>
-            <div class="loading-placeholder" id="inventory-panel">
-                <h3>Inventory System</h3>
-                <p>Stock tracking, auto-reorder, supplier integration</p>
-            </div>
-        </section>
+      <!-- Other sections -->
+      <section id="marketplace" class="content-section">
+        <div class="section-header">
+          <h2>🛒 Tools & Certifications Marketplace</h2>
+          <p>Access tools and training with group discounts</p>
+        </div>
 
-        <section id="analytics" class="content-section">
-            <div class="section-header">
-                <h2>📈 Analytics</h2>
-                <p>Performance metrics and insights</p>
+        <div class="cart-panel" id="cart-panel">
+          <div class="cart-header">
+            <h3>Cart</h3>
+            <div class="cart-meta">
+              <span class="cart-counter" id="cart-counter">0</span>
+              <button type="button" class="clear-cart-btn" id="clear-cart-btn">Clear</button>
             </div>
-            <div class="loading-placeholder" id="analytics-panel">
-                <h3>Analytics Dashboard</h3>
-                <p>Revenue tracking, efficiency metrics, predictive analytics</p>
-            </div>
-        </section>
+          </div>
+          <div class="cart-items" id="cart-items">
+            <p class="empty-cart">Your cart is empty.</p>
+          </div>
+          <div class="cart-total" id="cart-total">Total: $0</div>
+        </div>
 
-        <section id="compliance" class="content-section">
-            <div class="section-header">
-                <h2>🛡️ Compliance</h2>
-                <p>Security monitoring and compliance</p>
+        <div class="marketplace-grid" id="marketplace-grid">
+          <div class="marketplace-item">
+            <div class="item-info">
+              <h4>🔍 OBD-II Scanner Pro</h4>
+              <p>Professional diagnostic scanner with live data streaming</p>
+              <div class="price-info">
+                <span class="original-price">$299</span>
+                <span class="discount-price">$249</span>
+                <span class="discount-badge">17% OFF</span>
+              </div>
             </div>
-            <div class="loading-placeholder" id="compliance-panel">
-                <h3>Compliance Vault</h3>
-                <p>AES-256 encryption, audit trails, GDPR compliance</p>
-            </div>
-        </section>
+            <button
+              type="button"
+              class="add-to-cart-btn"
+              onclick="addToCart('OBD-II Scanner Pro', '$249')"
+            >
+              🛒 Add to Cart
+            </button>
+          </div>
 
-        <section id="settings" class="content-section">
-            <div class="section-header">
-                <h2>⚙️ Settings</h2>
-                <p>Configure RepairBridge preferences</p>
+          <div class="marketplace-item">
+            <div class="item-info">
+              <h4>🔬 Leak Detection Kit</h4>
+              <p>UV dye and detection system for fluid leaks</p>
+              <div class="price-info">
+                <span class="original-price">$89</span>
+                <span class="discount-price">$69</span>
+                <span class="discount-badge">22% OFF</span>
+              </div>
             </div>
-            <div class="data-sources">
-                <div class="source-card">
-                    <div class="source-header">
-                        <h3>Shop Account</h3>
-                        <span class="status-badge active" id="account-status">Active</span>
-                    </div>
-                    <div class="loading-placeholder" id="account-panel">
-                        <h4>Owner: —</h4>
-                        <h4>Shop: —</h4>
-                        <h4>Plan: —</h4>
-                    </div>
-                </div>
-                <div class="source-card">
-                    <div class="source-header">
-                        <h3>Subscription Tiers</h3>
-                    </div>
-                    <div class="loading-placeholder" id="billing-panel">
-                        <p>Plans will appear here.</p>
-                    </div>
-                </div>
+            <button
+              type="button"
+              class="add-to-cart-btn"
+              onclick="addToCart('Leak Detection Kit', '$69')"
+            >
+              🛒 Add to Cart
+            </button>
+          </div>
+
+          <div class="marketplace-item">
+            <div class="item-info">
+              <h4>📚 EV Diagnostics Course</h4>
+              <p>Comprehensive electric vehicle diagnostic training</p>
+              <div class="price-info">
+                <span class="original-price">$499</span>
+                <span class="discount-price">$399</span>
+                <span class="discount-badge">20% OFF</span>
+              </div>
             </div>
-        </section>
+            <button
+              type="button"
+              class="add-to-cart-btn"
+              onclick="addToCart('EV Diagnostics Course', '$399')"
+            >
+              🛒 Add to Cart
+            </button>
+          </div>
+
+          <div class="marketplace-item">
+            <div class="item-info">
+              <h4>🏆 ASE Certification Prep</h4>
+              <p>Complete preparation course for ASE certification</p>
+              <div class="price-info">
+                <span class="original-price">$199</span>
+                <span class="discount-price">$149</span>
+                <span class="discount-badge">25% OFF</span>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="add-to-cart-btn"
+              onclick="addToCart('ASE Certification Prep', '$149')"
+            >
+              🛒 Add to Cart
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section id="inventory" class="content-section">
+        <div class="section-header">
+          <h2>📦 Inventory</h2>
+          <p>Parts inventory and supplier management</p>
+        </div>
+        <div class="loading-placeholder" id="inventory-panel">
+          <h3>Inventory System</h3>
+          <p>Stock tracking, auto-reorder, supplier integration</p>
+        </div>
+      </section>
+
+      <section id="analytics" class="content-section">
+        <div class="section-header">
+          <h2>📈 Analytics</h2>
+          <p>Performance metrics and insights</p>
+        </div>
+        <div class="loading-placeholder" id="analytics-panel">
+          <h3>Analytics Dashboard</h3>
+          <p>Revenue tracking, efficiency metrics, predictive analytics</p>
+        </div>
+      </section>
+
+      <section id="compliance" class="content-section">
+        <div class="section-header">
+          <h2>🛡️ Compliance</h2>
+          <p>Security monitoring and compliance</p>
+        </div>
+        <div class="loading-placeholder" id="compliance-panel">
+          <h3>Compliance Vault</h3>
+          <p>AES-256 encryption, audit trails, GDPR compliance</p>
+        </div>
+      </section>
+
+      <section id="settings" class="content-section">
+        <div class="section-header">
+          <h2>⚙️ Settings</h2>
+          <p>Configure RepairBridge preferences</p>
+        </div>
+        <div class="data-sources">
+          <div class="source-card">
+            <div class="source-header">
+              <h3>Shop Account</h3>
+              <span class="status-badge active" id="account-status">Active</span>
+            </div>
+            <div class="loading-placeholder" id="account-panel">
+              <h4>Owner: —</h4>
+              <h4>Shop: —</h4>
+              <h4>Plan: —</h4>
+            </div>
+          </div>
+          <div class="source-card">
+            <div class="source-header">
+              <h3>Subscription Tiers</h3>
+            </div>
+            <div class="loading-placeholder" id="billing-panel">
+              <p>Plans will appear here.</p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
     <!-- Copyright -->
-    <div class="copyright">
-        ©2025 RepairBridge
-    </div>
+    <div class="copyright">©2025 RepairBridge</div>
 
     <script src="modules/state.js"></script>
     <script src="modules/config.js"></script>
@@ -449,5 +492,5 @@
     <script src="modules/search.js"></script>
     <script src="modules/reports.js"></script>
     <script src="script.js"></script>
-</body>
+  </body>
 </html>

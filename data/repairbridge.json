@@ -5,14 +5,14 @@
     "diagnostics": 5
   },
   "recentActivity": [
-    {"text": "🔧 Volvo S60 diagnostic completed", "time": "40 min ago"},
-    {"text": "📥 Toyota data feed synced", "time": "1 hour ago"}
+    { "text": "🔧 Volvo S60 diagnostic completed", "time": "40 min ago" },
+    { "text": "📥 Toyota data feed synced", "time": "1 hour ago" }
   ],
   "dataSources": [
-    {"name": "Ford Motor Company", "status": "connected", "lastSync": "8 min ago"},
-    {"name": "General Motors", "status": "connected", "lastSync": "12 min ago"},
-    {"name": "Toyota Motor Corp", "status": "connected", "lastSync": "10 min ago"},
-    {"name": "BMW Group", "status": "disconnected", "lastSync": "Connection issue"}
+    { "name": "Ford Motor Company", "status": "connected", "lastSync": "8 min ago" },
+    { "name": "General Motors", "status": "connected", "lastSync": "12 min ago" },
+    { "name": "Toyota Motor Corp", "status": "connected", "lastSync": "10 min ago" },
+    { "name": "BMW Group", "status": "disconnected", "lastSync": "Connection issue" }
   ],
   "dataAnalytics": {
     "quota": "82% of monthly quota",
@@ -47,9 +47,9 @@
   ],
   "inventory": {
     "lowStock": [
-      {"part": "Brake Pads (Ceramic)", "qty": 3},
-      {"part": "Oil Filters", "qty": 4},
-      {"part": "Spark Plugs", "qty": 2}
+      { "part": "Brake Pads (Ceramic)", "qty": 3 },
+      { "part": "Oil Filters", "qty": 4 },
+      { "part": "Spark Plugs", "qty": 2 }
     ],
     "suppliers": ["NAPA", "AutoZone Pro", "O'Reilly Wholesale"]
   },
@@ -65,8 +65,16 @@
     "status": "active"
   },
   "plans": [
-    {"name": "Starter", "price": "$49/mo", "features": ["VIN + recalls", "5 reports/month"]},
-    {"name": "Pro", "price": "$149/mo", "features": ["Unlimited VIN reports", "TSB lookup", "Inventory alerts"]},
-    {"name": "Fleet", "price": "$399/mo", "features": ["Multi-shop", "Fleet reports", "Priority support"]}
+    { "name": "Starter", "price": "$49/mo", "features": ["VIN + recalls", "5 reports/month"] },
+    {
+      "name": "Pro",
+      "price": "$149/mo",
+      "features": ["Unlimited VIN reports", "TSB lookup", "Inventory alerts"]
+    },
+    {
+      "name": "Fleet",
+      "price": "$399/mo",
+      "features": ["Multi-shop", "Fleet reports", "Priority support"]
+    }
   ]
 }

@@ -1,14 +1,18 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
 - Add TSB fallback (manual link/upload).
 
 ## [0.1.0] - 2026-03-01
+
 ### Added
+
 - VIN report view with PDF/CSV export.
 - Saved reports UI + search history.
 - Subscription tiers + shop accounts scaffolding.
@@ -22,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Draft privacy policy + terms of service.
 
 ### Changed
+
 - Split `script.js` into modules and consolidated duplicated logic.
 - Removed or documented unused modules/features.
 - Moved inline styles into CSS classes.
